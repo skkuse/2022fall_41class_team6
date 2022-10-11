@@ -1,12 +1,21 @@
 import React from 'react';
-import { Grid } from '@mui/material';
+import { Grid, IconButton } from '@mui/material';
+import { Home, Settings } from '@mui/icons-material';
 
 export default function Head() {
   return (
-    <Grid container>
-      <Grid item xs={3}>Home</Grid>
-      <Grid item xs={6}>Question</Grid>
-      <Grid item xs={3}>Setting</Grid>
+    <Grid container justifyContent="space-between" alignItems="center">
+      <Grid item>
+        <IconButton>
+          <Home />
+        </IconButton>
+      </Grid>
+      <Grid item>Question</Grid>
+      <Grid item>
+        <IconButton>
+          <Settings />
+        </IconButton>
+      </Grid>
     </Grid>
   );
 }
