@@ -1,6 +1,11 @@
 import React from 'react';
-import { Grid, IconButton } from '@mui/material';
-import { Home, Settings } from '@mui/icons-material';
+import { Grid, IconButton, TextField } from '@mui/material';
+import {
+  Home,
+  NavigateBefore,
+  NavigateNext,
+  Settings,
+} from '@mui/icons-material';
 
 export default function Head() {
   return (
@@ -10,8 +15,20 @@ export default function Head() {
           <Home />
         </IconButton>
       </Grid>
-      <Grid item>Question</Grid>
       <Grid item>
+        <TextField variant="outlined" size="small" disabled value="과목명" />
+        <TextField
+          variant="outlined"
+          size="small"
+          disabled
+          InputProps={{
+            startAdornment: <NavigateBefore />,
+            endAdornment: <NavigateNext />,
+          }}
+        />
+      </Grid>
+      <Grid item>
+        <TextField variant="outlined" size="small" disabled value="남은 시간" />
         <IconButton>
           <Settings />
         </IconButton>
