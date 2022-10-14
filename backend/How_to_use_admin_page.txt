@@ -1,0 +1,11 @@
+
+1. Execute "python3 manage.py createsuperuser" to create admin account.
+
+2. Execute "python3 manage.py runserver" to run server.
+
+3. Use web browser, go to "localhost:8000/admin" to go to admin page.
+
+4. Input account name and password that you created from 1.
+
+5. After login, you can manage database with admin page.
+
