@@ -2,21 +2,22 @@ from django.db import models
 
 # Create your models here.
 
-class Problem(models.Model):
-    ProblemId = models.AutoField(primary_key = True)
-    LectureName = models.CharField(max_length = 500)
-    ProblemName = models.CharField(max_length = 500)
-    DeadLine = models.DateField()
-    ProblemExplanation = models.TextField()
-    Requirements = models.TextField()
-    TestCaseId = models.IntegerField()
-    RelatedResources = models.TextField()
+class Lecture(models.Model):
+    lectureId = models.IntegerField(primary_key = True)
+    lectureName = models.TextField(default='')
 
-class TestCase(models.Model):
-    TestCaseId = models.AutoField(primary_key = True)
-    CaseInput = models.CharField(max_length = 500)
-    CaseOutput = models.CharField(max_length = 500)
+class Question(models.Model):
+    questionId = models.IntegerField(primary_key = True)
+    lectureId = models.ForeignKey(Lecture, on_delete = models.CASCADE)
 
-class Code(models.Model):
-    CodeId = models.AutoField(primary_key = True)
-    CodeInput = models.TextField()
+class Testcase(models.Model):
+    testcasId = models.IntegerField(primary_key = True)
+    questionId = models.ForeignKey(Question, on_delete = models.CASCADE)
+
+class Code_Saved(models.Model):
+    code_savedId = models.IntegerField(primary_key = True)
+    questionId = models.ForeignKey(Question, on_delete = models.CASCADE)
+
+class Code_Submitted(models.Model): 
+    code_submittedId = models.IntegerField(primary_key = True)
+    questionId = models.ForeignKey(Question, on_delete = models.CASCADE)
