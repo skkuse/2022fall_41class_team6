@@ -1,17 +1,27 @@
 from rest_framework import serializers
-from mainApp.models import Problem, TestCase, Code
+from mainApp.models import *
 
-class ProblemSerializer(serializers.ModelSerializer):
+class Lecture_Serializer(serializers.ModelSerializer):
     class Meta:
-        model = Problem
-        fields = ('ProblemId', 'LectureName', 'ProblemName', 'DeadLine', 'ProblemExplanation', 'Requirements', 'TestCaseId', 'RelatedResources')
+        model = Lecture
+        fields = ('lectureId', 'lectureName')
 
-class TestCaseSerializer(serializers.ModelSerializer):
+class Question_Serializer(serializers.ModelSerializer):
     class Meta:
-        model = TestCase
-        fields = ('TestCaseId', 'CaseInput' ,'CaseOutput')
+        model = Question
+        fields = ('questionId', 'lectureId')
 
-class CodeSerializer(serializers.ModelSerializer):
+class Testcase_Serializer(serializers.ModelSerializer):
     class Meta:
-        model = Code
-        fields = ('CodeId', 'CodeInput')
+        model = Testcase
+        fields = ('testcaseId', 'questionId')
+
+class Code_Saved_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Code_Saved
+        fields = ('code_savedId', 'questionId')
+
+class Code_Submitted_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Code_Submitted
+        fields = ('code_submittedId', 'questionId')

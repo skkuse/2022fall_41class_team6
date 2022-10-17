@@ -6,9 +6,8 @@ from django.contrib import admin
 from .models import *
 
 # Add models to admin site
-admin.site.register(Question)
 admin.site.register(Lecture)
+admin.site.register(Question)
+admin.site.register(Testcase)
 admin.site.register(Code_Submitted)
 admin.site.register(Code_Saved)
-admin.site.register(Testcase)
-

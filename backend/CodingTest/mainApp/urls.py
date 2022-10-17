@@ -17,10 +17,6 @@ from django.urls import path
 from mainApp import views
 
 urlpatterns = [
-    path('problem/', views.problemApi),
-    path('problem/<id>/', views.problemApi),
-    path('testcase/', views.testcaseApi),
-    path('testcase/<id>/', views.testcaseApi),
-    path('code/', views.codeApi),
-    path('code/<id>/', views.codeApi)
+    path('lecture/', views.lectureApi),
+    path('lecture/<id>/', views.lectureApi)
 ]
