@@ -10,7 +10,10 @@ from mainApp.serializers import *
 @csrf_exempt
 def lectureApi(request, id = 0):
     if request.method == 'GET':
-        lecture = Lecture.objects.all()
+        if id == 0:
+            lecture = Lecture.objects.all()
+        else:
+            lecture = Lecture.objects.filter(lectureId = id)
         lecture_serializer = Lecture_Serializer(lecture, many = True)
         return JsonResponse(lecture_serializer.data, safe = False)
     elif request.method == 'POST':
