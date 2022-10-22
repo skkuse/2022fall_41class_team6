@@ -18,5 +18,8 @@ from mainApp import views
 
 urlpatterns = [
     path('lecture/', views.lectureApi),
-    path('lecture/<id>/', views.lectureApi)
+    path('lecture/<id>/', views.lectureApi),
+    path('question/', views.questionApi),
+    path('question/<id>/', views.questionApi),
+
 ]
