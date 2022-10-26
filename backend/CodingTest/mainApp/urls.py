@@ -19,7 +19,20 @@ from mainApp import views
 urlpatterns = [
     path('lecture/', views.lectureApi),
     path('lecture/<id>/', views.lectureApi),
+
     path('question/', views.questionApi),
     path('question/<id>/', views.questionApi),
 
+    path('testcase/', views.testcaseApi),
+    path('testcase/<question_id>/', views.testcaseApi),
+    path('testcase/<question_id>/<id>', views.testcaseApi),
+
+    path('code_saved/', views.code_savedApi),
+    path('code_saved/<question_id>/', views.code_savedApi),
+    path('code_saved/<question_id>/<id>', views.code_savedApi),
+
+    path('code_submitted/', views.code_submittedApi),
+    path('code_submitted/<question_id>/', views.code_submittedApi),
+    path('code_submitted/<question_id>/<id>', views.code_submittedApi),
+    
 ]
