@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CssBaseline, Grid } from '@mui/material';
+import { Head } from './components/head';
 
 export default function App() {
   const [leftWidth, setLeftWidth] = useState(4);
@@ -15,6 +16,7 @@ export default function App() {
 
   return (
     <CssBaseline>
+      <Head />
       <Grid container>
         <Grid item xs={leftWidth}>
           <h1>Left</h1>
