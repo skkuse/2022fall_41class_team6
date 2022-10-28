@@ -58,7 +58,7 @@ def questionApi(request, id = 0):
         if question_serializer.is_valid():
             question_serializer.save()
             return JsonResponse("Update Successfully", safe = False)
-        return JsonResponse("Failed to Update", safe = False)
+        return JsonResponse("Failged to Update", safe = False)
     elif request.method == 'DELETE':
         question = Question.objects.get(questionId = id)
         question.delete()
