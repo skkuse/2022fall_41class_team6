@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import {
   createTheme, CssBaseline, Grid, ThemeProvider,
 } from '@mui/material';
-import { Head } from './components/head';
+import { Head } from './components/Head';
 import { CodeEditor } from './components/CodeEditor';
 
 const theme = createTheme({
