@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CssBaseline, Grid } from '@mui/material';
 import { Head } from './components/head';
-import { CodeEditor } from './components/codeEditor';
+import { CodeEditor } from './components/CodeEditor';
 
 export default function App() {
   const [leftWidth, setLeftWidth] = useState(4);
