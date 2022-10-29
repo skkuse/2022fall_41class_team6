@@ -23,7 +23,6 @@ export default function App() {
           <h1>Left</h1>
         </Grid>
         <Grid item xs={12 - leftWidth - rightWidth}>
-          <h1>Center</h1>
           <CodeEditor />
         </Grid>
         <Grid item xs={rightWidth}>
