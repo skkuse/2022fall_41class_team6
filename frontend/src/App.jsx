@@ -1,34 +1,57 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import { CssBaseline, Grid } from '@mui/material';
+import {
+  createTheme, CssBaseline, Grid, ThemeProvider,
+} from '@mui/material';
 import { Head } from './components/head';
 import { CodeEditor } from './components/CodeEditor';
 
-export default function App() {
-  const [leftWidth, setLeftWidth] = useState(4);
-  const [rightWidth, setRightWidth] = useState(4);
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#0f151a',
+    },
+  },
+});
 
-  const toggleLeft = () => {
-    setLeftWidth(leftWidth === 4 ? 1 : 4);
+const style = {
+  container: {
+    height: 'calc(100vh - 50px)',
+  },
+  itemCenter: {
+    borderLeft: '1px solid #0f151a',
+    borderRight: '1px solid #0f151a',
+  },
+};
+
+export default function App() {
+  const [leftWidth, setLeftWidth] = useState(3);
+  const [rightWidth, setRightWidth] = useState(3);
+
+  const toggleLeftWidth = () => {
+    setLeftWidth(leftWidth === 3 ? 1 : 3);
   };
 
-  const toggleRight = () => {
-    setRightWidth(rightWidth === 4 ? 1 : 4);
+  const toggleRightWidth = () => {
+    setRightWidth(rightWidth === 3 ? 1 : 3);
   };
 
   return (
     <CssBaseline>
-      <Head />
-      <Grid container>
-        <Grid item xs={leftWidth}>
-          <h1>Left</h1>
+      <ThemeProvider theme={theme}>
+        <Head />
+        <Grid container sx={style.container}>
+          <Grid item xs={leftWidth}>
+            <h1>Left</h1>
+          </Grid>
+          <Grid item xs={12 - leftWidth - rightWidth} sx={style.itemCenter}>
+            <CodeEditor />
+          </Grid>
+          <Grid item xs={rightWidth}>
+            <h1>Right</h1>
+          </Grid>
         </Grid>
-        <Grid item xs={12 - leftWidth - rightWidth}>
-          <CodeEditor />
-        </Grid>
-        <Grid item xs={rightWidth}>
-          <h1>Right</h1>
-        </Grid>
-      </Grid>
+      </ThemeProvider>
     </CssBaseline>
   );
 }

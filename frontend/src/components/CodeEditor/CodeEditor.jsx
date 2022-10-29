@@ -1,8 +1,6 @@
 import React from 'react';
 import Editor from '@monaco-editor/react';
-import {
-  Grid, IconButton, Button, Box,
-} from '@mui/material';
+import { Grid, IconButton, Button } from '@mui/material';
 import {
   Folder,
   Refresh,
@@ -11,86 +9,90 @@ import {
   Save,
 } from '@mui/icons-material';
 
+const style = {
+  container: {
+    height: 50,
+    px: 1,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  item: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  saveIcon: {
+    mr: 1,
+    color: 'primary.main',
+  },
+  saveButton: {
+    m: 0.5,
+    minWidth: 30,
+    height: 30,
+  },
+  iconButton: {
+    color: 'primary.main',
+  },
+  button: {
+    mx: 0.5,
+  },
+  submitButton: {
+    ml: 1,
+  },
+};
+
 export default function CodeEditor() {
   return (
     <Grid container direction="column" justifyContent="center">
-      <Grid container spacing={1} alignItems="center" justifyContent="center">
-        <Grid item xs={4.5}>
-          <p>코드 입력</p>
-        </Grid>
-        <Grid item>
-          <IconButton>
-            <Save />
-          </IconButton>
-        </Grid>
-        <Grid item>
-          <Button variant="contained" size="small">
+      <Grid container sx={style.container}>
+        <Grid item>코드 입력</Grid>
+        <Grid item sx={style.item}>
+          <Save sx={style.saveIcon} />
+          <Button variant="contained" size="small" sx={style.saveButton}>
             1
           </Button>
-        </Grid>
-        <Grid item>
-          <Button variant="contained" size="small">
+          <Button variant="contained" size="small" sx={style.saveButton}>
             2
           </Button>
-        </Grid>
-        <Grid item>
-          <Button variant="contained" size="small">
+          <Button variant="contained" size="small" sx={style.saveButton}>
             3
           </Button>
         </Grid>
       </Grid>
       <Grid item>
         <Editor
-          height="70vh"
+          height="calc(100vh - 150px)"
           defaultLanguage="javascript"
           defaultValue="// some comment"
         />
       </Grid>
       <Grid item>
-        <Box
-          sx={{
-            maxwidth: '100%',
-            border: '1px solid black',
-          }}
-        >
-          <Grid container alignItems="center">
-            <Grid item>
-              <IconButton>
-                <Folder />
-              </IconButton>
-            </Grid>
-            <Grid item>
-              <IconButton>
-                <Refresh />
-              </IconButton>
-            </Grid>
-            <Grid item>
-              <IconButton>
-                <ContentCopy />
-              </IconButton>
-            </Grid>
-            <Grid item xs={2.5}>
-              <IconButton>
-                <FileDownload />
-              </IconButton>
-            </Grid>
-            <Grid item>
-              <Button variant="contained" size="small">
-                실행
-              </Button>
-            </Grid>
-            <Grid item xs={2.2}>
-              <Button variant="contained" size="small">
-                저장
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button variant="outlined" size="small">
-                제출
-              </Button>
-            </Grid>
+        <Grid container sx={style.container}>
+          <Grid item>
+            <IconButton sx={style.iconButton}>
+              <Folder />
+            </IconButton>
+            <IconButton sx={style.iconButton}>
+              <Refresh />
+            </IconButton>
+            <IconButton sx={style.iconButton}>
+              <ContentCopy />
+            </IconButton>
+            <IconButton sx={style.iconButton}>
+              <FileDownload />
+            </IconButton>
           </Grid>
-        </Box>
+          <Grid item>
+            <Button variant="outlined" size="small" sx={style.button}>
+              실행
+            </Button>
+            <Button variant="outlined" size="small" sx={style.button}>
+              저장
+            </Button>
+            <Button variant="contained" size="small" sx={style.submitButton}>
+              제출
+            </Button>
+          </Grid>
+        </Grid>
       </Grid>
     </Grid>
   );
