@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CssBaseline, Grid } from '@mui/material';
 import { Head } from './components/head';
+import { CodeEditor } from './components/CodeEditor';
 
 export default function App() {
   const [leftWidth, setLeftWidth] = useState(4);
@@ -22,7 +23,7 @@ export default function App() {
           <h1>Left</h1>
         </Grid>
         <Grid item xs={12 - leftWidth - rightWidth}>
-          <h1>Center</h1>
+          <CodeEditor />
         </Grid>
         <Grid item xs={rightWidth}>
           <h1>Right</h1>
