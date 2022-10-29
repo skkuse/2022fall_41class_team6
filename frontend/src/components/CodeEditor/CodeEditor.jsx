@@ -71,7 +71,7 @@ export default function CodeEditor() {
       </Grid>
       <Grid item>
         <Editor
-          height="calc(100vh - 150px)"
+          height="calc(100vh - 151px)"
           defaultLanguage="javascript"
           defaultValue="// some comment"
         />
