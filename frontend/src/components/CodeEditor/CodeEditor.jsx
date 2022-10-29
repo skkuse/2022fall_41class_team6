@@ -16,7 +16,13 @@ const style = {
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  item: {
+  itemTopLeft: {
+    pl: 1,
+    color: 'primary.main',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  itemTopRight: {
     display: 'flex',
     alignItems: 'center',
   },
@@ -25,9 +31,12 @@ const style = {
     color: 'primary.main',
   },
   saveButton: {
-    m: 0.5,
+    mx: 0.5,
     minWidth: 30,
     height: 30,
+  },
+  itemBottom: {
+    borderTop: '1px solid #0f151a',
   },
   iconButton: {
     color: 'primary.main',
@@ -44,8 +53,10 @@ export default function CodeEditor() {
   return (
     <Grid container direction="column" justifyContent="center">
       <Grid container sx={style.container}>
-        <Grid item>코드 입력</Grid>
-        <Grid item sx={style.item}>
+        <Grid item sx={style.itemTopLeft}>
+          코드 입력
+        </Grid>
+        <Grid item sx={style.itemTopRight}>
           <Save sx={style.saveIcon} />
           <Button variant="contained" size="small" sx={style.saveButton}>
             1
@@ -65,7 +76,7 @@ export default function CodeEditor() {
           defaultValue="// some comment"
         />
       </Grid>
-      <Grid item>
+      <Grid item sx={style.itemBottom}>
         <Grid container sx={style.container}>
           <Grid item>
             <IconButton sx={style.iconButton}>

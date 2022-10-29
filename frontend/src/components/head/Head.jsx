@@ -15,6 +15,7 @@ const style = {
     bgcolor: 'primary.main',
   },
   itemLeft: {
+    pl: 1,
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
@@ -25,6 +26,7 @@ const style = {
     alignItems: 'center',
   },
   itemRight: {
+    pr: 1,
     display: 'flex',
     justifyContent: 'flex-end',
     alignItems: 'center',
