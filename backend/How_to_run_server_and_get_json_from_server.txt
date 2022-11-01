@@ -1,0 +1,20 @@
+1. Open shell
+
+2. Change directory to "backend/CodingTest". Where you can see manage.py
+
+3. (Initialization, you can skip this)
+Execute "python3 manage.py makemigrations"
+Execute "python3 manage.py migrate"
+
+4. Execute "python3 manage.py runserver" to run local server.
+
+5. You can get json from url.
+Example URL:
+localhost:8000/question/
+localhost:8000/question/1
+
+localhost:8000/lecture/
+localhost:8000/lecture/1
+
+6. To edit db, read "How_to_use_admin_page.txt".
+
