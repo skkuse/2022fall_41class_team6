@@ -8,7 +8,7 @@ const style = {
     overflow: 'auto',
   },
   header: {
-    height: 50,
+    height: 40,
     pl: 1,
     flex: '0 0 auto',
     display: 'flex',
