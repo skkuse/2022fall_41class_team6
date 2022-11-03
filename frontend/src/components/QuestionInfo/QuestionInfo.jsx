@@ -29,10 +29,11 @@ const style = {
   content: {
     px: 1,
     py: 2,
+    whiteSpace: 'pre-line',
   },
 };
 
-export default function ProblemInfo() {
+export default function QuestionInfo({ question }) {
   return (
     <Grid container direction="column" sx={style.container}>
       <Grid item sx={style.header}>
@@ -40,11 +41,11 @@ export default function ProblemInfo() {
       </Grid>
       <Grid item sx={style.subheader}>문제</Grid>
       <Grid item sx={style.content}>
-        문제
+        {question?.problemExplain || '문제를 선택해주세요.'}
       </Grid>
       <Grid item sx={style.subheader}>참조/제약사항</Grid>
       <Grid item sx={style.content}>
-        참조/제약사항
+        {question?.requirements || '문제를 선택해주세요.'}
       </Grid>
       <Grid item sx={style.header}>
         테스트케이스
