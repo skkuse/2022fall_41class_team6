@@ -49,7 +49,7 @@ const style = {
   },
 };
 
-export default function CodeEditor() {
+export default function CodeEditor({ question }) {
   return (
     <Grid container direction="column">
       <Grid container sx={style.container}>
@@ -73,7 +73,7 @@ export default function CodeEditor() {
         <Editor
           height="calc(100vh - 151px)"
           defaultLanguage="javascript"
-          defaultValue="// some comment"
+          value={question?.skeletonCode || ''}
         />
       </Grid>
       <Grid item sx={style.itemBottom}>
