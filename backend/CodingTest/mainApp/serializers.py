@@ -25,3 +25,8 @@ class Code_Submitted_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Code_Submitted
         fields = ('code_submittedId', 'questionId','sub_date', 'code')
+
+class Code_Submitted_Codeonly_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Code_Submitted
+        fields = ('code',)
