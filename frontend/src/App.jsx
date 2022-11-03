@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import { Head } from './components/Head';
 import { CodeEditor } from './components/CodeEditor';
+import { ProblemInfo } from './components/ProblemInfo';
 
 const theme = createTheme({
   palette: {
@@ -42,7 +43,7 @@ export default function App() {
         <Head />
         <Grid container sx={style.container}>
           <Grid item xs={leftWidth}>
-            <h1>Left</h1>
+            <ProblemInfo />
           </Grid>
           <Grid item xs={12 - leftWidth - rightWidth} sx={style.itemCenter}>
             <CodeEditor />
