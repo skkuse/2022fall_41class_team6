@@ -51,7 +51,7 @@ const style = {
 
 export default function CodeEditor() {
   return (
-    <Grid container direction="column" justifyContent="center">
+    <Grid container direction="column">
       <Grid container sx={style.container}>
         <Grid item sx={style.itemTopLeft}>
           코드 입력
