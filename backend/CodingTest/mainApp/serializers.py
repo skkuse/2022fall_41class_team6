@@ -30,3 +30,8 @@ class Code_Submitted_Codeonly_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Code_Submitted
         fields = ('code',)
+
+class Question_AnswerCodeonly_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ('answerCode',)

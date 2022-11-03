@@ -7,6 +7,7 @@ from mainApp.serializers import *
 
 import json
 import os,sys
+import copydetect
 
 # Create your views here.
 
@@ -188,4 +189,34 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
             efficiency = 0
 
         return JsonResponse(efficiency, safe = False)
+    return JsonResponse("only GET method is available", safe = False)
+
+def codePlagiarismApi(request, question_id = 0, id=0):
+    if request.method == 'GET':
+        code_submitted = Code_Submitted.objects.filter(questionId = question_id, code_submittedId = id)
+        code_submitted_codeonly_serializer = Code_Submitted_Codeonly_Serializer(code_submitted, many = True)
+        testcode = code_submitted_codeonly_serializer.data[0]["code"]
+
+        question = Question.objects.filter(questionId = question_id)
+        question_answercodeonly_serializer = Question_AnswerCodeonly_Serializer(question, many = True)
+        answercode = question_answercodeonly_serializer.data[0]["answerCode"]
+
+        # export code to temp/testcode.py
+        testfile = open('./temp/testcode.py', 'w')
+        testfile.write(testcode)
+        testfile.close()
+
+        # export answercode to temp/answercode.py
+        testfile = open('./temp/answercode.py', 'w')
+        testfile.write(answercode)
+        testfile.close()
+        
+        #######################################################
+        fp1 = copydetect.CodeFingerprint('./temp/testcode.py', 25, 1)
+        fp2 = copydetect.CodeFingerprint('./temp/answercode.py', 25, 1)
+        _, similarities, _ = copydetect.compare_files(fp1, fp2)
+
+        plagiarism = 100 * similarities[0]        
+
+        return JsonResponse(plagiarism, safe = False)
     return JsonResponse("only GET method is available", safe = False)
