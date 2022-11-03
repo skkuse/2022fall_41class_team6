@@ -5,6 +5,9 @@ from django.http.response import JsonResponse
 from mainApp.models import *
 from mainApp.serializers import *
 
+import json
+import os,sys
+
 # Create your views here.
 
 @csrf_exempt
@@ -153,4 +156,36 @@ def code_submittedApi(request, question_id = 0, id=0):
         code_submitted = Question.objects.get(questionId = question_id, code_submittedId = id)
         code_submitted.delete()
         return JsonResponse("Deleted Successfully", safe = False)
+ 
+def codeEfficiencyApi(request, question_id = 0, id=0):
+    if request.method == 'GET':
+        code_submitted = Code_Submitted.objects.filter(questionId = question_id, code_submittedId = id)
+        code_submitted_codeonly_serializer = Code_Submitted_Codeonly_Serializer(code_submitted, many = True)
+        rawcode = code_submitted_codeonly_serializer.data[0]["code"]
+
+        # export code to temp/rawcode.py
+        testfile = open('./temp/rawcode.py', 'w')
+        testfile.write(rawcode)
+        testfile.close()
+
+        # do multimetric and save as temp/multiout.json
+        terminal_command = "multimetric temp/rawcode.py | tee temp/multiout.json"
+        os.system(terminal_command)
         
+        #######################################################
+        # calculating efficiency algorithm should be improved #
+        #######################################################
+        # open temp/multiout.json and get cyclomatic complexity
+        multiout = open ("./temp/multiout.json", "r")
+        outjson = json.load(multiout)
+        multiout.close()
+        cycomp = outjson['overall']['cyclomatic_complexity']
+
+        # calculate efficiency from cyclomatic complexity
+        if(cycomp <= 50):
+            efficiency = 100 - cycomp * 2
+        else:
+            efficiency = 0
+
+        return JsonResponse(efficiency, safe = False)
+    return JsonResponse("only GET method is available", safe = False)
