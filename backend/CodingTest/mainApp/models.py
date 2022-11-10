@@ -13,7 +13,7 @@ class Question(models.Model):
     skeletonCode = models.TextField(default = '')
     questionName = models.CharField(max_length = 500, default = '')
     deadline = models.DateField(null = True)
-    problemExplain = models.TextField(default = '')
+    explanation = models.TextField(default = '')
     requirements = models.TextField(default = '')
     answerCode = models.TextField(default = '')
     relatedResource = models.TextField(default = '')
@@ -21,7 +21,7 @@ class Question(models.Model):
 
 
 class Testcase(models.Model):
-    testcasId = models.IntegerField(primary_key = True)
+    testcaseId = models.IntegerField(primary_key = True)
     questionId = models.ForeignKey(Question, on_delete = models.CASCADE)
     input = models.TextField(default = '')
     output = models.TextField(default = '')
