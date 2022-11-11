@@ -224,7 +224,9 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
         # make dictionary for output
         outscore = {
             "locscore" : locscore,
-            "cycscore" : efficiency
+            "halsted" : efficiency,
+            "dataflow_complexity" : 25,
+            "controlflow_complexity" : 25
         }
 
         # json dumps??
