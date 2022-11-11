@@ -9,7 +9,7 @@ class Lecture_Serializer(serializers.ModelSerializer):
 class Question_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Question
-        fields = ('questionId', 'lectureId', 'skeletonCode', 'questionName', 'deadline', 'problemExplain', 'requirements', 'answerCode', 'relatedResource', 'submissionCount')
+        fields = ('questionId', 'lectureId', 'skeletonCode', 'questionName', 'deadline', 'explanation', 'requirements', 'answerCode', 'relatedResource', 'submissionCount')
 
 class Testcase_Serializer(serializers.ModelSerializer):
     class Meta:
@@ -30,3 +30,8 @@ class Code_Submitted_Codeonly_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Code_Submitted
         fields = ('code',)
+
+class Question_AnswerCodeonly_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ('answerCode',)
