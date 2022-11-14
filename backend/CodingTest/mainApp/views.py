@@ -76,7 +76,7 @@ def testcaseApi(request, question_id = 0, id=0):
         elif id == 0: # 'testcase/<question_id>/' case
             testcase = Testcase.objects.filter(questionId = question_id)
         else: # 'testcase/<question_id>/<id>/' case
-            testcase = Testcase.objects.filter(questionId = question_id, testcaesId = id)
+            testcase = Testcase.objects.filter(questionId = question_id, testcaseId = id)
         testcase_serializer = Testcase_Serializer(testcase, many = True)
         return JsonResponse(testcase_serializer.data, safe = False)
     elif request.method == 'POST':
