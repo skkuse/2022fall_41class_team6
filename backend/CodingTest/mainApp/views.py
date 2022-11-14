@@ -217,7 +217,7 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
 
         # calculate efficiency from cyclomatic complexity
         if(cycomp <= 50):
-            efficiency = 100 - cycomp * 2
+            efficiency = 25 - cycomp * decimal.Decimal('0.5')
         else:
             efficiency = 0
 
@@ -229,10 +229,7 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
             "controlflow_complexity" : 25
         }
 
-        # json dumps??
-        # outjson = json.dumps(outscore)
-
-        return JsonResponse(outscore, safe = False)
+        return JsonResponse(outscore)
     return JsonResponse("only GET method is available", safe = False)
 
 def codePlagiarismApi(request, question_id = 0, id=0):
@@ -264,3 +261,67 @@ def codePlagiarismApi(request, question_id = 0, id=0):
 
         return JsonResponse(plagiarism, safe = False)
     return JsonResponse("only GET method is available", safe = False)
+
+def codeVisibilityApi(request, question_id, id):
+    if request.method == 'GET':
+        question = Question.objects.filter(questionId = question_id)
+        code_submitted = Code_Submitted.objects.filter(questionId = question_id, code_submittedId = id)
+        code_submitted_codeonly_serializer = Code_Submitted_Codeonly_Serializer(code_submitted, many = True)
+
+        rawcode = code_submitted_codeonly_serializer.data[0]["code"]
+
+        # export code to temp/tempcode.py
+        tempfile = open('./temp/tempcode.py', 'w')
+        tempfile.write(rawcode)
+        tempfile.close()
+
+        # do pylama for submitted code and save output as pylamaReport#.json
+        terminal_command = "pylama ./temp/tempcode.py -l \"mypy\" --format json --report ./temp/pylamaReport1.json"
+        os.system(terminal_command)
+        terminal_command = "pylama ./temp/tempcode.py -l \"pylint\" --format json --report ./temp/pylamaReport2.json"
+        os.system(terminal_command)
+        terminal_command = "pylama ./temp/tempcode.py -l \"eradicate\" --format json --report ./temp/pylamaReport3.json"
+        os.system(terminal_command)
+        terminal_command = "pylama ./temp/tempcode.py -l \"radon\" --format json --report ./temp/pylamaReport4.json"
+        os.system(terminal_command)
+        terminal_command = "pylama ./temp/tempcode.py -l \"pycodestyle\" --format json --report ./temp/pylamaReport5.json"
+        os.system(terminal_command)
+
+        # get json from pylamaReport.json
+        pylamaJsonfile = open ("./temp/pylamaReport1.json", "r")
+        pylamaJson = json.load(pylamaJsonfile)
+        pylamaJsonfile.close()
+        score1 = max(0, 20 - len(pylamaJson))
+
+        pylamaJsonfile = open ("./temp/pylamaReport2.json", "r")
+        pylamaJson = json.load(pylamaJsonfile)
+        pylamaJsonfile.close()
+        score2 = max(0, 20 - len(pylamaJson))
+
+        pylamaJsonfile = open ("./temp/pylamaReport3.json", "r")
+        pylamaJson = json.load(pylamaJsonfile)
+        pylamaJsonfile.close()
+        score3 = max(0, 20 - len(pylamaJson))
+
+        pylamaJsonfile = open ("./temp/pylamaReport4.json", "r")
+        pylamaJson = json.load(pylamaJsonfile)
+        pylamaJsonfile.close()
+        score4 = max(0, 20 - len(pylamaJson))
+
+        pylamaJsonfile = open ("./temp/pylamaReport5.json", "r")
+        pylamaJson = json.load(pylamaJsonfile)
+        pylamaJsonfile.close()
+        score5 = max(0, 20 - len(pylamaJson))
+
+        # make dictionary for output
+        outscore = {
+            "mypy" : score1,
+            "pylint" : score2,
+            "eradicate" : score3,
+            "radon" : score4,
+            "pycodestyle" : score5
+        }
+
+        return JsonResponse(outscore)
+    return JsonResponse("only GET method is available", safe = False)
+
