@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { Head } from './components/Head';
 import { CodeEditor } from './components/CodeEditor';
-import { ProblemInfo } from './components/ProblemInfo';
+import { QuestionInfo } from './components/QuestionInfo';
 
 const theme = createTheme({
   palette: {
@@ -28,6 +28,10 @@ const style = {
 export default function App() {
   const [leftWidth, setLeftWidth] = useState(3);
   const [rightWidth, setRightWidth] = useState(3);
+  const [lectureList, setLectureList] = useState({});
+  const [selectedLectureId, setSelectedLectureId] = useState(0);
+  const [questionList, setQuestionList] = useState({});
+  const [selectedQuestionId, setSelectedQuestionId] = useState(0);
 
   const toggleLeftWidth = () => {
     setLeftWidth(leftWidth === 3 ? 1 : 3);
@@ -40,17 +44,24 @@ export default function App() {
   return (
     <CssBaseline>
       <ThemeProvider theme={theme}>
-        <Head />
+        <Head
+          lectureList={lectureList}
+          setLectureList={setLectureList}
+          selectedLectureId={selectedLectureId}
+          setSelectedLectureId={setSelectedLectureId}
+          questionList={questionList}
+          setQuestionList={setQuestionList}
+          selectedQuestionId={selectedQuestionId}
+          setSelectedQuestionId={setSelectedQuestionId}
+        />
         <Grid container sx={style.container}>
           <Grid item xs={leftWidth}>
-            <ProblemInfo />
+            <QuestionInfo question={questionList[selectedQuestionId]} />
           </Grid>
           <Grid item xs={12 - leftWidth - rightWidth} sx={style.itemCenter}>
-            <CodeEditor />
+            <CodeEditor question={questionList[selectedQuestionId]} />
           </Grid>
-          <Grid item xs={rightWidth}>
-            <h1>Right</h1>
-          </Grid>
+          <Grid item xs={rightWidth} />
         </Grid>
       </ThemeProvider>
     </CssBaseline>

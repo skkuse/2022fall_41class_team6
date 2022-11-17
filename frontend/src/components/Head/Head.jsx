@@ -1,12 +1,10 @@
 /* eslint-disable react/jsx-no-duplicate-props */
-import React from 'react';
-import { Grid, IconButton, TextField } from '@mui/material';
+import React, { useEffect } from 'react';
+import axios from 'axios';
 import {
-  Home,
-  NavigateBefore,
-  NavigateNext,
-  Settings,
-} from '@mui/icons-material';
+  Grid, IconButton, MenuItem, TextField,
+} from '@mui/material';
+import { Home, Settings } from '@mui/icons-material';
 
 const style = {
   container: {
@@ -32,6 +30,7 @@ const style = {
     alignItems: 'center',
   },
   textField: {
+    width: 150,
     mx: 0.5,
   },
   iconButton: {
@@ -47,7 +46,40 @@ const style = {
   },
 };
 
-export default function Head() {
+export default function Head({
+  lectureList,
+  setLectureList,
+  selectedLectureId,
+  setSelectedLectureId,
+  questionList,
+  setQuestionList,
+  selectedQuestionId,
+  setSelectedQuestionId,
+}) {
+  useEffect(() => {
+    axios.get('/lecture').then(({ data }) => {
+      data.forEach(({ lectureId, lectureName }) => {
+        setLectureList((prev) => ({
+          ...prev,
+          [lectureId]: lectureName,
+        }));
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    const newQuestionList = {};
+    axios.get('/question').then(({ data }) => {
+      data.forEach(({ lectureId, questionId, ...rest }) => {
+        if (lectureId === Number(selectedLectureId)) {
+          newQuestionList[questionId] = rest;
+        }
+      });
+      setQuestionList(newQuestionList);
+    });
+    setSelectedQuestionId(0);
+  }, [selectedLectureId]);
+
   return (
     <Grid container sx={style.container}>
       <Grid item xs={3} sx={style.itemLeft}>
@@ -57,33 +89,52 @@ export default function Head() {
       </Grid>
       <Grid item xs={6} sx={style.itemCenter}>
         <TextField
+          select
           variant="outlined"
           size="small"
-          disabled
-          value="과목명"
+          value={selectedLectureId}
+          onChange={(e) => setSelectedLectureId(e.target.value)}
           InputProps={{ sx: style.Input }}
           inputProps={{ sx: style.input }}
           sx={style.textField}
-        />
+        >
+          <MenuItem value={0}>과목 선택</MenuItem>
+          {Object.entries(lectureList).map(([lectureId, lectureName]) => (
+            <MenuItem key={lectureId} value={lectureId}>
+              {lectureName}
+            </MenuItem>
+          ))}
+        </TextField>
         <TextField
+          select
           variant="outlined"
           size="small"
-          disabled
-          InputProps={{
-            sx: style.Input,
-            startAdornment: <NavigateBefore />,
-            endAdornment: <NavigateNext />,
-          }}
+          value={selectedQuestionId}
+          onChange={(e) => setSelectedQuestionId(e.target.value)}
+          InputProps={{ sx: style.Input }}
           inputProps={{ sx: style.input }}
           sx={style.textField}
-        />
+        >
+          <MenuItem value={0}>문제 선택</MenuItem>
+          {Object.entries(questionList).map(
+            ([questionId, { questionName }]) => (
+              <MenuItem key={questionId} value={questionId}>
+                {questionName}
+              </MenuItem>
+            ),
+          )}
+        </TextField>
       </Grid>
       <Grid item xs={3} sx={style.itemRight}>
         <TextField
           variant="outlined"
           size="small"
           disabled
-          value="남은 시간"
+          value={
+            selectedQuestionId
+              ? `${questionList[selectedQuestionId]?.deadline} 까지`
+              : '제출기한'
+          }
           InputProps={{ sx: style.Input }}
           inputProps={{ sx: style.input }}
           sx={style.textField}
