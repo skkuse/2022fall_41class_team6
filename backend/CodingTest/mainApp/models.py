@@ -13,7 +13,7 @@ class Question(models.Model):
     skeletonCode = models.TextField(default = '')
     questionName = models.CharField(max_length = 500, default = '')
     deadline = models.DateField(null = True)
-    explanation = models.TextField(default = '')
+    problemExplain = models.TextField(default = '')
     requirements = models.TextField(default = '')
     answerCode = models.TextField(default = '')
     relatedResource = models.TextField(default = '')
