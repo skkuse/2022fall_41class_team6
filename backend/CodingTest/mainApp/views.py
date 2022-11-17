@@ -8,7 +8,6 @@ from mainApp.serializers import *
 import json
 import os,sys
 import copydetect
-import decimal
 
 # Create your views here.
 
@@ -76,7 +75,7 @@ def testcaseApi(request, question_id = 0, id=0):
         elif id == 0: # 'testcase/<question_id>/' case
             testcase = Testcase.objects.filter(questionId = question_id)
         else: # 'testcase/<question_id>/<id>/' case
-            testcase = Testcase.objects.filter(questionId = question_id, testcaseId = id)
+            testcase = Testcase.objects.filter(questionId = question_id, testcaesId = id)
         testcase_serializer = Testcase_Serializer(testcase, many = True)
         return JsonResponse(testcase_serializer.data, safe = False)
     elif request.method == 'POST':
@@ -161,59 +160,27 @@ def code_submittedApi(request, question_id = 0, id=0):
  
 def codeEfficiencyApi(request, question_id = 0, id=0):
     if request.method == 'GET':
-        question = Question.objects.filter(questionId = question_id)
-        question_answercodeonly_serializer = Question_AnswerCodeonly_Serializer(question, many = True)
         code_submitted = Code_Submitted.objects.filter(questionId = question_id, code_submittedId = id)
         code_submitted_codeonly_serializer = Code_Submitted_Codeonly_Serializer(code_submitted, many = True)
-
         rawcode = code_submitted_codeonly_serializer.data[0]["code"]
-        answercode = question_answercodeonly_serializer.data[0]["answerCode"]
 
-        # export code to temp/tempcode.py
-        tempfile = open('./temp/tempcode.py', 'w')
-        tempfile.write(rawcode)
-        tempfile.close()
+        # export code to temp/rawcode.py
+        testfile = open('./temp/rawcode.py', 'w')
+        testfile.write(rawcode)
+        testfile.close()
 
-        # export answercode to temp/answercode.py
-        tempfile = open('./temp/answercode.py', 'w')
-        tempfile.write(answercode)
-        tempfile.close()
-
-        # do multimetric for submitted code and save as ./temp/efficiency.json
-        terminal_command = "multimetric ./temp/tempcode.py | tee ./temp/efficiency.json"
+        # do multimetric and save as temp/multiout.json
+        terminal_command = "multimetric temp/rawcode.py | tee temp/multiout.json"
         os.system(terminal_command)
-
-        # do multimetric for answer code and save as ./temp/answereff.json
-        terminal_command = "multimetric ./temp/answercode.py | tee ./temp/answereff.json"
-        os.system(terminal_command)
-
+        
         #######################################################
         # calculating efficiency algorithm should be improved #
         #######################################################
-        
-        # get data from files
-        eff_file = open ("./temp/efficiency.json", "r")
-        outjson = json.load(eff_file)
-        eff_file.close()
-        anseff_file = open("./temp/answereff.json", "r")
-        ansoutjson = json.load(anseff_file)
-        anseff_file.close()
-     
+        # open temp/multiout.json and get cyclomatic complexity
+        multiout = open ("./temp/multiout.json", "r")
+        outjson = json.load(multiout)
+        multiout.close()
         cycomp = outjson['overall']['cyclomatic_complexity']
-        loc = outjson['overall']['loc']
-        ansloc = ansoutjson['overall']['loc']
-
-        if ( loc < ansloc ):
-            locscore = 25
-        elif ( loc == ansloc ):
-            locscore = 24
-        else: 
-            locscore = 24
-            locdiff = loc - ansloc
-            while ( locscore > 0 and locdiff > 0):
-                locscore -= 1
-                # 1 point reduce per 10% longer code
-                locdiff -= decimal.Decimal('0.1')  * ansloc
 
         # calculate efficiency from cyclomatic complexity
         if(cycomp <= 50):
@@ -221,18 +188,7 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
         else:
             efficiency = 0
 
-        # make dictionary for output
-        outscore = {
-            "locscore" : locscore,
-            "halsted" : efficiency,
-            "dataflow_complexity" : 25,
-            "controlflow_complexity" : 25
-        }
-
-        # json dumps??
-        # outjson = json.dumps(outscore)
-
-        return JsonResponse(outscore, safe = False)
+        return JsonResponse(efficiency, safe = False)
     return JsonResponse("only GET method is available", safe = False)
 
 def codePlagiarismApi(request, question_id = 0, id=0):
@@ -263,4 +219,39 @@ def codePlagiarismApi(request, question_id = 0, id=0):
         plagiarism = 100 * similarities[0]        
 
         return JsonResponse(plagiarism, safe = False)
+    return JsonResponse("only GET method is available", safe = False)
+
+def unittestApi(request, testcase_id = 0, id = 0):
+    if request.method == 'GET':
+        code_submitted = Code_Submitted.objects.filter(code_submittedId = id)
+        code_submitted_codeonly_serializer = Code_Submitted_Codeonly_Serializer(code_submitted, many = True)
+        testcode = code_submitted_codeonly_serializer.data[0]["code"]
+
+        testcase = Testcase.objects.filter(testcaseId = testcase_id)
+        testcase_serializer = Testcase_Serializer(testcase, many = True)
+        input = testcase_serializer.data[0]["input"]
+        output = testcase_serializer.data[0]["output"]
+
+        # export code to temp/testcode.py
+        testfile = open('./temp/testcode.py', 'w')
+        testfile.write(testcode)
+        testfile.close()
+
+        # export code to temp/input.txt
+        testfile = open('./temp/input.txt', 'w')
+        testfile.write(input)
+        testfile.close()
+
+        # export code to temp/output.txt
+        testfile = open('./temp/output.txt', 'w')
+        testfile.write(output)
+        testfile.close()
+
+        # do unittest and save as temp/unittestresult.txt
+        terminal_command = "python -m unittest ./mainApp/myunittest.py 2> ./temp/unittestresult.txt"
+        os.system(terminal_command)
+
+        testfile = open('./temp/unittestresult.txt', 'r')
+        return JsonResponse(testfile.read()[0], safe = False)
+
     return JsonResponse("only GET method is available", safe = False)
