@@ -55,6 +55,8 @@ export default function Head({
   setQuestionList,
   selectedQuestionId,
   setSelectedQuestionId,
+  testcaseList,
+  setTestcaseList,
 }) {
   useEffect(() => {
     axios.get('/lecture').then(({ data }) => {
@@ -79,6 +81,18 @@ export default function Head({
     });
     setSelectedQuestionId(0);
   }, [selectedLectureId]);
+
+  useEffect(() => {
+    var i = 0;
+    const newTestcaseList = {};
+    axios.get('/testcase/' + selectedQuestionId).then(({ data }) => {
+      data.forEach(({ testcaseId, questionId, ...rest }) => {
+        newTestcaseList[i] = rest;
+        i++;
+      });
+      setTestcaseList(newTestcaseList);
+    });
+  }, [selectedQuestionId]);
 
   return (
     <Grid container sx={style.container}>
