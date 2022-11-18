@@ -87,6 +87,10 @@ export default function CodeEditor({
 
   const editorRef = useRef(null);
 
+  function handleEditorDidMount(editor, monaco) {
+    editorRef.current = editor; 
+  }
+
   function codeSavedBtn(num){
     let id = Number(codeSavedIdList[num-1]);
     if (codeSavedList[id]){
@@ -173,7 +177,7 @@ export default function CodeEditor({
           height="calc(100vh - 151px)"
           defaultLanguage="python"
           value={question?.skeletonCode || ''}
-          
+          onMount={handleEditorDidMount}
         />
       </Grid>
       <Grid item sx={style.itemBottom}>
