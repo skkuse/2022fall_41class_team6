@@ -9,6 +9,9 @@ import json
 import os,sys
 import copydetect
 import decimal
+import openai
+
+
 
 # Create your views here.
 
@@ -264,3 +267,30 @@ def codePlagiarismApi(request, question_id = 0, id=0):
 
         return JsonResponse(plagiarism, safe = False)
     return JsonResponse("only GET method is available", safe = False)
+
+
+
+def codeExplainApi(request, question_id = 0, id=0):
+    if request.method == 'GET':
+        code_submitted = Code_Submitted.objects.filter(questionId = question_id, code_submittedId = id)
+        code_submitted_codeonly_serializer = Code_Submitted_Codeonly_Serializer(code_submitted, many = True)
+        rawcode = code_submitted_codeonly_serializer.data[0]["code"]
+        
+        My_OpenAI_key = "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"
+        openai.api_key = My_OpenAI_key
+
+        # set openapi model
+        response = openai.Completion.create(
+            model="text-davinci-002",
+            prompt= rawcode + "\"\"\"\nHere's what the above class is doing:\n1.",
+            temperature=0.2,
+            max_tokens=64,
+            top_p=1.0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+            stop=["\"\"\""]
+        )
+        result = "Written code is doing the following.\n1. " + response.choices[0].text.strip()
+        return JsonResponse(result, safe= False)
+    else:
+        return JsonResponse("only GET method is available!", safe= False)
