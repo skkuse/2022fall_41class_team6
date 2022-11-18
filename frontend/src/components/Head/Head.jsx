@@ -57,6 +57,7 @@ export default function Head({
   setSelectedQuestionId,
   testcaseList,
   setTestcaseList,
+  
 }) {
   useEffect(() => {
     axios.get('/lecture').then(({ data }) => {
@@ -86,9 +87,11 @@ export default function Head({
     var i = 0;
     const newTestcaseList = {};
     axios.get('/testcase/' + selectedQuestionId).then(({ data }) => {
-      data.forEach(({ testcaseId, questionId, ...rest }) => {
-        newTestcaseList[i] = rest;
-        i++;
+      data.forEach(({ testcaseId, questionId, isHidden, ...rest }) => {
+        if(!isHidden){
+          newTestcaseList[i] = rest;
+          i++;
+        }
       });
       setTestcaseList(newTestcaseList);
     });

@@ -50,40 +50,27 @@ export default function QuestionInfo({ question, testcaseList }) {
       <Grid item sx={style.header}>
         테스트케이스
       </Grid>
-      <Grid item sx={style.subheader}>테스트케이스 1</Grid>
-      <Grid item container>
-        <Grid item xs={6}>
-          Input
-        </Grid>
-        <Grid item xs={6}>
-          Output
-        </Grid>
-      </Grid>
-      <Grid item container>
-        <Grid item xs={6}>
-          {testcaseList[0]?.input}
-        </Grid>
-        <Grid item xs={6}>
-          {testcaseList[0]?.output}
-        </Grid>
-      </Grid>
-      <Grid item sx={style.subheader}>테스트케이스 2</Grid>
-      <Grid item container>
-        <Grid item xs={6}>
-          Input
-        </Grid>
-        <Grid item xs={6}>
-          Output
-        </Grid>
-      </Grid>
-      <Grid item container>
-        <Grid item xs={6}>
-          {testcaseList[1]?.input}
-        </Grid>
-        <Grid item xs={6}>
-          {testcaseList[1]?.output}
-        </Grid>
-      </Grid>
+      {Object.entries(testcaseList).map((testcase, index) => (
+        <div>
+          <Grid item sx={style.subheader}>테스트케이스 {index + 1}</Grid>
+          <Grid item container>
+            <Grid item xs={6}>
+              Input
+            </Grid>
+            <Grid item xs={6}>
+              Output
+            </Grid>
+          </Grid>
+          <Grid item container>
+            <Grid item xs={6}>
+              {testcaseList[index]?.input}
+            </Grid>
+            <Grid item xs={6}>
+              {testcaseList[index]?.output}
+            </Grid>
+          </Grid>
+        </div>
+      ))}
     </Grid>
   );
 }
