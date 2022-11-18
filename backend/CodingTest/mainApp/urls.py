@@ -37,5 +37,6 @@ urlpatterns = [
     path('code_submitted/<question_id>/<id>/efficiency', views.codeEfficiencyApi),
     path('code_submitted/<question_id>/<id>/visibility', views.code_submittedApi),
     path('code_submitted/<question_id>/<id>/plagiarism', views.codePlagiarismApi),
-    path('code_submitted/<question_id>/<id>/explain', views.codeExplainApi)
+    path('code_submitted/<question_id>/<id>/explain', views.codeExplainApi),
+    path('code_submitted/<testcase_id>/<id>/unittest', views.unittestApi)
 ]
