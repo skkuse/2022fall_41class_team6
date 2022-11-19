@@ -294,3 +294,39 @@ def codeExplainApi(request, question_id = 0, id=0):
         return JsonResponse(result, safe= False)
     else:
         return JsonResponse("only GET method is available!", safe= False)
+
+def unittestApi(request, testcase_id = 0, id = 0):
+    if request.method == 'GET':
+        code_submitted = Code_Submitted.objects.filter(code_submittedId = id)
+        code_submitted_codeonly_serializer = Code_Submitted_Codeonly_Serializer(code_submitted, many = True)
+        testcode = code_submitted_codeonly_serializer.data[0]["code"]
+
+        testcase = Testcase.objects.filter(testcaseId = testcase_id)
+        testcase_serializer = Testcase_Serializer(testcase, many = True)
+        input = testcase_serializer.data[0]["input"].replace('\r', '')
+        output = testcase_serializer.data[0]["output"].replace('\r', '')
+
+        # export code to temp/testcode.py
+        testfile = open('./temp/testcode.py', 'w')
+        testfile.write(testcode)
+        testfile.close()
+
+        # export code to temp/input.txt
+        testfile = open('./temp/input.txt', 'w')
+        testfile.write(input)
+        testfile.close()
+
+        # export code to temp/output.txt
+        testfile = open('./temp/output.txt', 'w')
+        testfile.write(output)
+        testfile.close()
+
+        # do unittest and save as temp/unittestresult.txt
+        terminal_command = "python -m unittest ./mainApp/myunittest.py 2> ./temp/unittestresult.txt"
+        os.system(terminal_command)
+
+        # correct "." wrong "F" error "E"
+        testfile = open('./temp/unittestresult.txt', 'r')
+        return JsonResponse(testfile.read()[0], safe = False)
+
+    return JsonResponse("only GET method is available", safe = False)
