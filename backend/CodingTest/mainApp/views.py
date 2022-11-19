@@ -304,7 +304,7 @@ def unittestApi(request, testcase_id = 0, id = 0):
         testcase = Testcase.objects.filter(testcaseId = testcase_id)
         testcase_serializer = Testcase_Serializer(testcase, many = True)
         input = testcase_serializer.data[0]["input"].replace('\r', '')
-        output = testcase_serializer.data[0]["output"]
+        output = testcase_serializer.data[0]["output"].replace('\r', '')
 
         # export code to temp/testcode.py
         testfile = open('./temp/testcode.py', 'w')
