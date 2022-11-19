@@ -6,11 +6,11 @@ class MyUnitTest(unittest.TestCase):
 
     def test(self):
         file = open('./temp/input.txt', 'r')
-        user_input = file.read().split()
+        user_input = file.read().split('\n')
         file.close()
 
         file = open('./temp/output.txt', 'r')
-        right_ans = file.read().split()
+        right_ans = file.read().split('\n')
         if len(right_ans) == 1:
             right_ans = int(right_ans[0])
         else:

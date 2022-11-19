@@ -303,7 +303,7 @@ def unittestApi(request, testcase_id = 0, id = 0):
 
         testcase = Testcase.objects.filter(testcaseId = testcase_id)
         testcase_serializer = Testcase_Serializer(testcase, many = True)
-        input = testcase_serializer.data[0]["input"]
+        input = testcase_serializer.data[0]["input"].replace('\r', '')
         output = testcase_serializer.data[0]["output"]
 
         # export code to temp/testcode.py
@@ -325,6 +325,7 @@ def unittestApi(request, testcase_id = 0, id = 0):
         terminal_command = "python -m unittest ./mainApp/myunittest.py 2> ./temp/unittestresult.txt"
         os.system(terminal_command)
 
+        # correct "." wrong "F" error "E"
         testfile = open('./temp/unittestresult.txt', 'r')
         return JsonResponse(testfile.read()[0], safe = False)
 
