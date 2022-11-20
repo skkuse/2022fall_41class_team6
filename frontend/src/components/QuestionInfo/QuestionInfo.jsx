@@ -33,7 +33,7 @@ const style = {
   },
 };
 
-export default function QuestionInfo({ question }) {
+export default function QuestionInfo({ question, testcaseList }) {
   return (
     <Grid container direction="column" sx={style.container}>
       <Grid item sx={style.header}>
@@ -41,7 +41,7 @@ export default function QuestionInfo({ question }) {
       </Grid>
       <Grid item sx={style.subheader}>문제</Grid>
       <Grid item sx={style.content}>
-        {question?.problemExplain || '문제를 선택해주세요.'}
+        {question?.explanation || '문제를 선택해주세요.'}
       </Grid>
       <Grid item sx={style.subheader}>참조/제약사항</Grid>
       <Grid item sx={style.content}>
@@ -50,15 +50,27 @@ export default function QuestionInfo({ question }) {
       <Grid item sx={style.header}>
         테스트케이스
       </Grid>
-      <Grid item sx={style.subheader}>테스트케이스 1</Grid>
-      <Grid item container>
-        <Grid item xs={6}>
-          Input
-        </Grid>
-        <Grid item xs={6}>
-          Output
-        </Grid>
-      </Grid>
+      {Object.entries(testcaseList).map((testcase, index) => (
+        <div>
+          <Grid item sx={style.subheader}>테스트케이스 {index + 1}</Grid>
+          <Grid item container>
+            <Grid item xs={6}>
+              Input
+            </Grid>
+            <Grid item xs={6}>
+              Output
+            </Grid>
+          </Grid>
+          <Grid item container>
+            <Grid item xs={6}>
+              {testcaseList[index]?.input}
+            </Grid>
+            <Grid item xs={6}>
+              {testcaseList[index]?.output}
+            </Grid>
+          </Grid>
+        </div>
+      ))}
     </Grid>
   );
 }
