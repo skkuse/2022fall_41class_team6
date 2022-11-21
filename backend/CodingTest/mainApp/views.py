@@ -190,10 +190,6 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
         terminal_command = "multimetric ./temp/answercode.py | tee ./temp/answereff.json"
         os.system(terminal_command)
 
-        #######################################################
-        # calculating efficiency algorithm should be improved #
-        #######################################################
-        
         # get data from files
         eff_file = open ("./temp/efficiency.json", "r")
         outjson = json.load(eff_file)
@@ -203,9 +199,17 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
         anseff_file.close()
      
         cycomp = outjson['overall']['cyclomatic_complexity']
+        anscycomp = ansoutjson['overall']['cyclomatic_complexity']
         loc = outjson['overall']['loc']
         ansloc = ansoutjson['overall']['loc']
+        diff = outjson['overall']['halstead_difficulty']
+        ansdiff = ansoutjson['overall']['halstead_difficulty']
+        ###
+        datacomp = 10
+        ansdatacomp = 10
+        ###
 
+        # grade from the number of lines of code
         if ( loc < ansloc ):
             locscore = 25
         elif ( loc == ansloc ):
@@ -217,25 +221,57 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
                 locscore -= 1
                 # 1 point reduce per 10% longer code
                 locdiff -= decimal.Decimal('0.1')  * ansloc
+        
+        # grade from halstead_difficulty
+        if ( diff < ansdiff ):
+            diffscore = 25
+        elif ( diff == ansdiff ):
+            diffscore = 24
+        else: 
+            diffscore = 24
+            diffdiff = diff - ansdiff
+            while ( diffscore > 0 and diffdiff > 0):
+                diffscore -= 1
+                # 1 point reduce per 10% more halstead_difficulty
+                diffdiff -= 0.1 * ansdiff
 
-        # calculate efficiency from cyclomatic complexity
-        if(cycomp <= 50):
-            efficiency = 100 - cycomp * 2
-        else:
-            efficiency = 0
+        # grade from dataflow complexity
+        if ( datacomp < ansdatacomp ):
+            datacompscore = 25
+        elif ( datacomp == ansdatacomp ):
+            datacompscore = 24
+        else: 
+            datacompscore = 24
+            datacompdiff = datacomp - ansdatacomp
+            while ( datacompscore > 0 and datacompdiff > 0):
+                ###
+                datacompscore -= 1
+                # 1 point reduce per 0.5 more dataflow complexity
+                datacompdiff -= 0.5
+                ###
 
+        # grade from cyclomatic complexity
+        if ( cycomp < anscycomp ):
+            cycompscore = 25
+        elif ( cycomp == anscycomp ):
+            cycompscore = 24
+        else: 
+            cycompscore = 24
+            cycompdiff = cycomp - anscycomp
+            while ( cycompscore > 0 and cycompdiff > 0):
+                cycompscore -= 1
+                # 1 point reduce per 0.5 more cyclomatic complexity
+                cycompdiff -= 0.5
+        
         # make dictionary for output
         outscore = {
-            "locscore" : locscore,
-            "halsted" : efficiency,
-            "dataflow_complexity" : 25,
-            "controlflow_complexity" : 25
+            "line_of_codes" : [locscore, ansloc, loc],
+            "halstead_difficulty" : [diffscore, ansdiff, diff],
+            "dataflow_complexity" : [datacompscore, ansdatacomp, datacomp],
+            "controlflow_complexity" : [cycompscore, anscycomp, cycomp]
         }
 
-        # json dumps??
-        # outjson = json.dumps(outscore)
-
-        return JsonResponse(outscore, safe = False)
+        return JsonResponse(outscore)
     return JsonResponse("only GET method is available", safe = False)
 
 def codePlagiarismApi(request, question_id = 0, id=0):
@@ -268,7 +304,84 @@ def codePlagiarismApi(request, question_id = 0, id=0):
         return JsonResponse(plagiarism, safe = False)
     return JsonResponse("only GET method is available", safe = False)
 
+def codeVisibilityApi(request, question_id, id):
+    if request.method == 'GET':
+        question = Question.objects.filter(questionId = question_id)
+        code_submitted = Code_Submitted.objects.filter(questionId = question_id, code_submittedId = id)
+        code_submitted_codeonly_serializer = Code_Submitted_Codeonly_Serializer(code_submitted, many = True)
 
+        rawcode = code_submitted_codeonly_serializer.data[0]["code"]
+
+        # export code to temp/tempcode.py
+        tempfile = open('./temp/tempcode.py', 'w')
+        tempfile.write(rawcode)
+        tempfile.close()
+
+        # do pylama for submitted code and save output as pylamaReport#.json
+        terminal_command = "pylama ./temp/tempcode.py -l \"mypy\" --format json --report ./temp/pylamaReport_mypy.json"
+        os.system(terminal_command)
+        terminal_command = "pylama ./temp/tempcode.py -l \"pylint\" --format json --report ./temp/pylamaReport_pylint.json"
+        os.system(terminal_command)
+        terminal_command = "pylama ./temp/tempcode.py -l \"eradicate\" --format json --report ./temp/pylamaReport_eradicate.json"
+        os.system(terminal_command)
+        terminal_command = "pylama ./temp/tempcode.py -l \"radon\" --format json --report ./temp/pylamaReport_radon.json"
+        os.system(terminal_command)
+        terminal_command = "pylama ./temp/tempcode.py -l \"pycodestyle\" --format json --report ./temp/pylamaReport_pycodestyle.json"
+        os.system(terminal_command)
+
+        # get json from pylamaReport.json
+        pylamaJsonfile = open ("./temp/pylamaReport_mypy.json", "r")
+        pylamaJson_mypy = json.load(pylamaJsonfile)
+        pylamaJsonfile.close()
+        score1 = max(0, 20 - len(pylamaJson_mypy))
+
+        pylamaJsonfile = open ("./temp/pylamaReport_pylint.json", "r")
+        pylamaJson_pylint = json.load(pylamaJsonfile)
+        pylamaJsonfile.close()
+        score2 = max(0, 20 - len(pylamaJson_pylint))
+
+        pylamaJsonfile = open ("./temp/pylamaReport_eradicate.json", "r")
+        pylamaJson_eradicate = json.load(pylamaJsonfile)
+        pylamaJsonfile.close()
+        score3 = max(0, 20 - len(pylamaJson_eradicate))
+
+        pylamaJsonfile = open ("./temp/pylamaReport_radon.json", "r")
+        pylamaJson_radon = json.load(pylamaJsonfile)
+        pylamaJsonfile.close()
+        score4 = max(0, 20 - len(pylamaJson_radon))
+
+        pylamaJsonfile = open ("./temp/pylamaReport_pycodestyle.json", "r")
+        pylamaJson_pycodestyle = json.load(pylamaJsonfile)
+        pylamaJsonfile.close()
+        score5 = max(0, 20 - len(pylamaJson_pycodestyle))
+
+        # make dictionary for output
+        outscore = {
+            "mypy" : [score1],
+            "pylint" : [score2],
+            "eradicate" : [score3],
+            "radon" : [score4],
+            "pycodestyle" : [score5]
+        }
+
+        # add minus score factors
+        for _dict in pylamaJson_mypy:
+            outscore["mypy"].append(_dict["message"])
+
+        for _dict in pylamaJson_pylint:
+            outscore["pylint"].append(_dict["message"])
+
+        for _dict in pylamaJson_eradicate:
+            outscore["eradicate"].append(_dict["message"])
+        
+        for _dict in pylamaJson_radon:
+            outscore["radon"].append(_dict["message"])
+        
+        for _dict in pylamaJson_pycodestyle:
+            outscore["pycodestyle"].append(_dict["message"])
+
+        return JsonResponse(outscore)
+    return JsonResponse("only GET method is available", safe = False)
 
 def codeExplainApi(request, question_id = 0, id=0):
     if request.method == 'GET':
