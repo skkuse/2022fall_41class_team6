@@ -32,6 +32,9 @@ export default function App() {
   const [selectedLectureId, setSelectedLectureId] = useState(0);
   const [questionList, setQuestionList] = useState({});
   const [selectedQuestionId, setSelectedQuestionId] = useState(0);
+  const [testcaseList, setTestcaseList] = useState({});
+  const [codeSavedList, setCodeSavedList] = useState({});
+  const [codeSavedIdList, setCodeSavedIdList] = useState({});
 
   const toggleLeftWidth = () => {
     setLeftWidth(leftWidth === 3 ? 1 : 3);
@@ -53,13 +56,25 @@ export default function App() {
           setQuestionList={setQuestionList}
           selectedQuestionId={selectedQuestionId}
           setSelectedQuestionId={setSelectedQuestionId}
+          testcaseList={testcaseList}
+          setTestcaseList={setTestcaseList}
         />
         <Grid container sx={style.container}>
           <Grid item xs={leftWidth}>
-            <QuestionInfo question={questionList[selectedQuestionId]} />
+            <QuestionInfo
+              question={questionList[selectedQuestionId]}
+              testcaseList={testcaseList}
+            />
           </Grid>
           <Grid item xs={12 - leftWidth - rightWidth} sx={style.itemCenter}>
-            <CodeEditor question={questionList[selectedQuestionId]} />
+            <CodeEditor
+              question={questionList[selectedQuestionId]}
+              questionid={selectedQuestionId}
+              codeSavedList={codeSavedList}
+              setCodeSavedList={setCodeSavedList}
+              codeSavedIdList={codeSavedIdList}
+              setCodeSavedIdList={setCodeSavedIdList}
+            />
           </Grid>
           <Grid item xs={rightWidth} />
         </Grid>

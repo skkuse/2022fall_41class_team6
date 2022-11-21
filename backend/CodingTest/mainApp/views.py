@@ -9,6 +9,9 @@ import json
 import os,sys
 import copydetect
 import decimal
+import openai
+
+
 
 # Create your views here.
 
@@ -325,3 +328,63 @@ def codeVisibilityApi(request, question_id, id):
         return JsonResponse(outscore)
     return JsonResponse("only GET method is available", safe = False)
 
+def codeExplainApi(request, question_id = 0, id=0):
+    if request.method == 'GET':
+        code_submitted = Code_Submitted.objects.filter(questionId = question_id, code_submittedId = id)
+        code_submitted_codeonly_serializer = Code_Submitted_Codeonly_Serializer(code_submitted, many = True)
+        rawcode = code_submitted_codeonly_serializer.data[0]["code"]
+        
+        My_OpenAI_key = "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"
+        openai.api_key = My_OpenAI_key
+
+        # set openapi model
+        response = openai.Completion.create(
+            model="text-davinci-002",
+            prompt= rawcode + "\"\"\"\nHere's what the above class is doing:\n1.",
+            temperature=0.2,
+            max_tokens=64,
+            top_p=1.0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+            stop=["\"\"\""]
+        )
+        result = "Written code is doing the following.\n1. " + response.choices[0].text.strip()
+        return JsonResponse(result, safe= False)
+    else:
+        return JsonResponse("only GET method is available!", safe= False)
+
+def unittestApi(request, testcase_id = 0, id = 0):
+    if request.method == 'GET':
+        code_submitted = Code_Submitted.objects.filter(code_submittedId = id)
+        code_submitted_codeonly_serializer = Code_Submitted_Codeonly_Serializer(code_submitted, many = True)
+        testcode = code_submitted_codeonly_serializer.data[0]["code"]
+
+        testcase = Testcase.objects.filter(testcaseId = testcase_id)
+        testcase_serializer = Testcase_Serializer(testcase, many = True)
+        input = testcase_serializer.data[0]["input"].replace('\r', '')
+        output = testcase_serializer.data[0]["output"].replace('\r', '')
+
+        # export code to temp/testcode.py
+        testfile = open('./temp/testcode.py', 'w')
+        testfile.write(testcode)
+        testfile.close()
+
+        # export code to temp/input.txt
+        testfile = open('./temp/input.txt', 'w')
+        testfile.write(input)
+        testfile.close()
+
+        # export code to temp/output.txt
+        testfile = open('./temp/output.txt', 'w')
+        testfile.write(output)
+        testfile.close()
+
+        # do unittest and save as temp/unittestresult.txt
+        terminal_command = "python -m unittest ./mainApp/myunittest.py 2> ./temp/unittestresult.txt"
+        os.system(terminal_command)
+
+        # correct "." wrong "F" error "E"
+        testfile = open('./temp/unittestresult.txt', 'r')
+        return JsonResponse(testfile.read()[0], safe = False)
+
+    return JsonResponse("only GET method is available", safe = False)
