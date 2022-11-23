@@ -168,7 +168,7 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
         question_answercodeonly_serializer = Question_AnswerCodeonly_Serializer(question, many = True)
         code_submitted = Code_Submitted.objects.filter(questionId = question_id, code_submittedId = id)
         code_submitted_codeonly_serializer = Code_Submitted_Codeonly_Serializer(code_submitted, many = True)
-
+        
         rawcode = code_submitted_codeonly_serializer.data[0]["code"]
         answercode = question_answercodeonly_serializer.data[0]["answerCode"]
 
@@ -235,20 +235,71 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
                 # 1 point reduce per 10% more halstead_difficulty
                 diffdiff -= 0.1 * ansdiff
 
+        
+        # make python file to fit in memory_profiler
+        # save as ./temp/datatemp.py
+        dataf = open("./temp/datatemp.py", 'w')
+        dataf.write("@profile\n")
+        dataf.write(rawcode)
+        dataf.write("\nsolution()\n")
+        dataf.close()
+        # repeat with answer code
+        dataf = open("./temp/datatemp_ans.py", 'w')
+        dataf.write("@profile\n")
+        dataf.write(answercode)
+        dataf.write("\nsolution()\n")
+        dataf.close()
+        
+        # read first testcase and make input file to test data complexity
+        testcase = Testcase.objects.filter(questionId = question_id)[0]
+        testcase_serializer = Testcase_Serializer(testcase)
+        inputdata = testcase_serializer.data["input"]
+        with open("./temp/testinput.txt", "w") as tifile:
+            tifile.write(inputdata)
+
+        # run file with memory profiler and give testcase input
+        # then log as ./temp/dataout.txt
+        tc = "python3 -m memory_profiler ./temp/datatemp.py < ./temp/testinput.txt | tee ./temp/dataout.txt"
+        os.system(tc)
+        # repeat with answer code
+        tc = "python3 -m memory_profiler ./temp/datatemp_ans.py < ./temp/testinput.txt | tee ./temp/dataout_ans.txt"
+        os.system(tc)
+
+        # parse logfile and pick maximum memory usage
+        with open("./temp/dataout.txt", "r") as logfile:
+            nextline = logfile.readline()
+            memmax = 0
+            while ( nextline != '' ):
+                linesplit = nextline.split()
+                for i in range(len(linesplit)):
+                    if(linesplit[i] == 'MiB'):
+                        memmax = max(memmax, float(linesplit[i-1]))
+                        break
+                nextline = logfile.readline()
+        # repeat with answer code's log file
+        with open("./temp/dataout_ans.txt", "r") as logfile:
+            nextline = logfile.readline()
+            memmax_ans = 0
+            while ( nextline != '' ):
+                linesplit = nextline.split()
+                for i in range(len(linesplit)):
+                    if(linesplit[i] == 'MiB'):
+                        memmax_ans = max(memmax_ans, float(linesplit[i-1]))
+                        break
+                nextline = logfile.readline()
+        
         # grade from dataflow complexity
-        if ( datacomp < ansdatacomp ):
+        if ( memmax < memmax_ans ):
             datacompscore = 25
-        elif ( datacomp == ansdatacomp ):
+        elif ( memmax == memmax_ans ):
             datacompscore = 24
         else: 
             datacompscore = 24
-            datacompdiff = datacomp - ansdatacomp
-            while ( datacompscore > 0 and datacompdiff > 0):
-                ###
+            memmax_copy = memmax
+            while ( memmax_copy > memmax_ans and datacompscore > 0):
                 datacompscore -= 1
-                # 1 point reduce per 0.5 more dataflow complexity
-                datacompdiff -= 0.5
-                ###
+                # 1 point reduce per 2x more memory usage
+                memmax_copy /= 2
 
         # grade from cyclomatic complexity
         if ( cycomp < anscycomp ):
@@ -267,7 +318,7 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
         outscore = {
             "line_of_codes" : [locscore, ansloc, loc],
             "halstead_difficulty" : [diffscore, ansdiff, diff],
-            "dataflow_complexity" : [datacompscore, ansdatacomp, datacomp],
+            "dataflow_complexity" : [datacompscore, memmax_ans, memmax],
             "controlflow_complexity" : [cycompscore, anscycomp, cycomp]
         }
 
