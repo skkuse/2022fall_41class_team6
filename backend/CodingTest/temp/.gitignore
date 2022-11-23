@@ -5,3 +5,7 @@ testcode.py
 efficiency.json
 answereff.json
 pylamaReport*.json
+data*.txt
+data*.py
+input.txt
+testinput.txt
