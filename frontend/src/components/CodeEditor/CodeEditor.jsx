@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import Editor from '@monaco-editor/react';
-import { Grid, IconButton, Button} from '@mui/material';
+import { Grid, IconButton, Button, Input} from '@mui/material';
 import {
   Folder,
   Refresh,
@@ -9,7 +9,7 @@ import {
   FileDownload,
   Save,
 } from '@mui/icons-material';
-import { useCallback } from 'react';
+import { saveAs } from 'file-saver';
 
 const style = {
   container: {
@@ -71,6 +71,10 @@ export default function CodeEditor({
     const newCodeSavedList = {};
     const newCodeSavedIdList = {};
     let i = 0;
+
+    // 저장된 코드 불러오기 기능
+    // (code saved Id를 array에 넣고 버튼 누르면 해당 칸에서 id값 빼와서 접근하는 방식)
+
     axios.get('/code_saved').then(({ data }) => {
       data.forEach(({ code_savedId, questionId, code}) => {
         if(Number(questionid) === questionId){
@@ -82,8 +86,6 @@ export default function CodeEditor({
       setCodeSavedIdList(newCodeSavedIdList);
     });
   },[questionid]);
-
-  //code saved Id를 array에 넣고 버튼 누르면 해당 칸에서 id값 빼와서 접근
 
   const editorRef = useRef(null);
 
@@ -120,10 +122,31 @@ export default function CodeEditor({
 
   }
 
+  // 코드 불러오기 기능
+  const fileInput = useRef();
+
+  const handleClickButton = () => {
+    fileInput.current.click();
+  }
+
+  const handleChange = e => {
+    const fileObj = e.target.files[0];
+    if(fileObj){
+      
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      editorRef.current.setValue(String(reader.result));
+    }
+    reader.readAsText(e.target.files[0], 'utf-8');
+  };
+
+  // 코드 초기화 기능
   function codeRefresh() {
     editorRef.current.setValue(String(question?.skeletonCode));
   }
 
+  // 코드 복사 기능
   function codeCopy() {
     let text = String(editorRef.current.getValue());
     if (navigator.clipboard){
@@ -135,10 +158,13 @@ export default function CodeEditor({
       });
     }
   }
-
-  function codeLoad() {
-    let reader = new FileReader();
-    reader.readAsDataURL(e.target.files[i]);
+  
+  // 코드 다운로드 기능
+  function downloadAsFile(){
+    var text = String(editorRef.current.getValue());
+    console.log(text);
+    var blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+    saveAs(blob, 'temp.py');
   }
 
   return (
@@ -153,21 +179,24 @@ export default function CodeEditor({
           variant="contained" 
           size="small" 
           sx={style.saveButton}
-          onClick={() => codeSavedBtn(1)}  >
+          onClick={() => codeSavedBtn(1)}  
+          disabled = {codeSavedIdList[0] ? false : true} >
             1
           </Button>
           <Button 
           variant="contained" 
           size="small" 
           sx={style.saveButton}
-          onClick={() => codeSavedBtn(2)}>
+          onClick={() => codeSavedBtn(2)}
+          disabled = {codeSavedIdList[1] ? false : true} >
             2
           </Button>
           <Button 
           variant="contained" 
           size="small" 
           sx={style.saveButton}
-          onClick={() => codeSavedBtn(3)}>
+          onClick={() => codeSavedBtn(3)}
+          disabled = {codeSavedIdList[2] ? false : true} >
             3
           </Button>
         </Grid>
@@ -183,16 +212,22 @@ export default function CodeEditor({
       <Grid item sx={style.itemBottom}>
         <Grid container sx={style.container}>
           <Grid item>
-            <IconButton sx={style.iconButton} onClick={codeLoad}>
+            <IconButton sx={style.iconButton} onClick={handleClickButton}>
               <Folder />
             </IconButton>
+            <Input 
+              type='file' 
+              style={{display:'none'}}
+              onChange={handleChange} 
+              inputRef={fileInput}
+            />
             <IconButton sx={style.iconButton} onClick={codeRefresh}>
               <Refresh />
             </IconButton>
             <IconButton sx={style.iconButton} onClick={codeCopy}>
               <ContentCopy />
             </IconButton>
-            <IconButton sx={style.iconButton}>
+            <IconButton sx={style.iconButton} onClick={downloadAsFile}>
               <FileDownload />
             </IconButton>
           </Grid>
@@ -206,7 +241,6 @@ export default function CodeEditor({
             <Button variant="contained" size="small" sx={style.submitButton}>
               제출
             </Button>
-           
           </Grid>
         </Grid>
       </Grid>
