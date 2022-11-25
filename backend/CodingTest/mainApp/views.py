@@ -43,7 +43,7 @@ def lectureApi(request, id = 0):
         lecture = Lecture.objects.get(lectureId = id)
         lecture.delete()
         return JsonResponse("Deleted Successfully", safe = False)
-
+@csrf_exempt
 def questionApi(request, id = 0):
     if request.method == 'GET':
         if id == 0: # 'question/' case
@@ -71,7 +71,7 @@ def questionApi(request, id = 0):
         question = Question.objects.get(questionId = id)
         question.delete()
         return JsonResponse("Deleted Successfully", safe = False)
-
+@csrf_exempt
 def testcaseApi(request, question_id = 0, id=0):
     if request.method == 'GET':
         if question_id == 0: # 'testcase/' case
@@ -101,7 +101,7 @@ def testcaseApi(request, question_id = 0, id=0):
         testcase = Testcase.objects.get(testcaseId = id)
         testcase.delete()
         return JsonResponse("Testcase is Successfully Deleted", safe = False)
-
+@csrf_exempt
 def code_savedApi(request, question_id = 0, id=0):
     if request.method == 'GET':
         if question_id == 0: # 'code_saved/' case
@@ -131,7 +131,7 @@ def code_savedApi(request, question_id = 0, id=0):
         code_saved = Code_Saved.objects.get(questionId = question_id, code_savedId = id)
         code_saved.delete()
         return JsonResponse("Saved COde is Succesfully Deleted", safe = False)
-
+@csrf_exempt
 def code_submittedApi(request, question_id = 0, id=0):
     if request.method == 'GET':
         if question_id == 0: # 'code_submitted/' case
@@ -161,7 +161,7 @@ def code_submittedApi(request, question_id = 0, id=0):
         code_submitted = Question.objects.get(questionId = question_id, code_submittedId = id)
         code_submitted.delete()
         return JsonResponse("Deleted Successfully", safe = False)
- 
+@csrf_exempt 
 def codeEfficiencyApi(request, question_id = 0, id=0):
     if request.method == 'GET':
         question = Question.objects.filter(questionId = question_id)
@@ -324,7 +324,7 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
 
         return JsonResponse(outscore)
     return JsonResponse("only GET method is available", safe = False)
-
+@csrf_exempt
 def codePlagiarismApi(request, question_id = 0, id=0):
     if request.method == 'GET':
         code_submitted = Code_Submitted.objects.filter(questionId = question_id, code_submittedId = id)
@@ -354,7 +354,7 @@ def codePlagiarismApi(request, question_id = 0, id=0):
 
         return JsonResponse(plagiarism, safe = False)
     return JsonResponse("only GET method is available", safe = False)
-
+@csrf_exempt
 def codeVisibilityApi(request, question_id, id):
     if request.method == 'GET':
         question = Question.objects.filter(questionId = question_id)
@@ -433,7 +433,7 @@ def codeVisibilityApi(request, question_id, id):
 
         return JsonResponse(outscore)
     return JsonResponse("only GET method is available", safe = False)
-
+@csrf_exempt
 def codeExplainApi(request, question_id = 0, id=0):
     if request.method == 'GET':
         code_submitted = Code_Submitted.objects.filter(questionId = question_id, code_submittedId = id)
@@ -458,7 +458,7 @@ def codeExplainApi(request, question_id = 0, id=0):
         return JsonResponse(result, safe= False)
     else:
         return JsonResponse("only GET method is available!", safe= False)
-
+@csrf_exempt
 def unittestApi(request, testcase_id = 0, id = 0):
     if request.method == 'GET':
         code_submitted = Code_Submitted.objects.filter(code_submittedId = id)
