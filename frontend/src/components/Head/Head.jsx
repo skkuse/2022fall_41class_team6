@@ -23,7 +23,7 @@ const style = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-  },
+  }, 
   itemRight: {
     pr: 1,
     display: 'flex',
@@ -60,7 +60,7 @@ export default function Head({
   setTestcaseList,
   deadlineDate,
   setDeadlineDate,
-  
+
 }) {
   useEffect(() => {
     axios.get('/lecture').then(({ data }) => {
@@ -87,11 +87,13 @@ export default function Head({
   }, [selectedLectureId]);
 
   useEffect(() => {
-    var i = 0;
+    let i = 0;
     const newTestcaseList = {};
-    axios.get('/testcase/' + selectedQuestionId).then(({ data }) => {
-      data.forEach(({ testcaseId, questionId, isHidden, ...rest }) => {
-        if(!isHidden){
+    axios.get(`/testcase/${selectedQuestionId}`).then(({ data }) => {
+      data.forEach(({
+        testcaseId, questionId, isHidden, ...rest
+      }) => {
+        if (!isHidden) {
           newTestcaseList[i] = rest;
           i++;
         }
@@ -102,22 +104,22 @@ export default function Head({
 
   useEffect(() => {
     const newTimeLeft = {};
-    var setTime = questionList[selectedQuestionId]?.deadline;
+    const setTime = questionList[selectedQuestionId]?.deadline;
 
     const deadline = moment(setTime, 'YYYY-MM-DD');
     const nowTime = moment();
 
     const dayleft = deadline.diff(nowTime, 'days');
-   
-    newTimeLeft[0] = dayleft + '';
+
+    newTimeLeft[0] = `${dayleft}`;
     newTimeLeft[1] = 23 - new Date().getHours();
     newTimeLeft[2] = 59 - new Date().getMinutes();
-    
+
     setDeadlineDate(newTimeLeft);
   }, [selectedQuestionId, new Date()]);
 
-  function clickHomeButton(){
-    location.href = "http://127.0.0.1:3000"
+  function clickHomeButton() {
+    location.href = 'http://127.0.0.1:3000';
   }
 
   return (
@@ -177,7 +179,7 @@ export default function Head({
           }
           InputProps={{ sx: style.Input }}
           inputProps={{ sx: style.input }}
-          sx={style.textField, style.width=600}
+          sx={{ ...style.textField, width: 600 }}
         />
         <IconButton sx={style.iconButton}>
           <Settings />
