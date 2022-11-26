@@ -5,6 +5,7 @@ import {
   Grid, IconButton, MenuItem, TextField,
 } from '@mui/material';
 import { Home, Settings } from '@mui/icons-material';
+import moment from 'moment';
 
 const style = {
   container: {
@@ -22,7 +23,7 @@ const style = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-  },
+  }, 
   itemRight: {
     pr: 1,
     display: 'flex',
@@ -57,7 +58,9 @@ export default function Head({
   setSelectedQuestionId,
   testcaseList,
   setTestcaseList,
-  
+  deadlineDate,
+  setDeadlineDate,
+
 }) {
   useEffect(() => {
     axios.get('/lecture').then(({ data }) => {
@@ -84,11 +87,13 @@ export default function Head({
   }, [selectedLectureId]);
 
   useEffect(() => {
-    var i = 0;
+    let i = 0;
     const newTestcaseList = {};
-    axios.get('/testcase/' + selectedQuestionId).then(({ data }) => {
-      data.forEach(({ testcaseId, questionId, isHidden, ...rest }) => {
-        if(!isHidden){
+    axios.get(`/testcase/${selectedQuestionId}`).then(({ data }) => {
+      data.forEach(({
+        testcaseId, questionId, isHidden, ...rest
+      }) => {
+        if (!isHidden) {
           newTestcaseList[i] = rest;
           i++;
         }
@@ -97,10 +102,30 @@ export default function Head({
     });
   }, [selectedQuestionId]);
 
+  useEffect(() => {
+    const newTimeLeft = {};
+    const setTime = questionList[selectedQuestionId]?.deadline;
+
+    const deadline = moment(setTime, 'YYYY-MM-DD');
+    const nowTime = moment();
+
+    const dayleft = deadline.diff(nowTime, 'days');
+
+    newTimeLeft[0] = `${dayleft}`;
+    newTimeLeft[1] = 23 - new Date().getHours();
+    newTimeLeft[2] = 59 - new Date().getMinutes();
+
+    setDeadlineDate(newTimeLeft);
+  }, [selectedQuestionId, new Date()]);
+
+  function clickHomeButton() {
+    location.href = 'http://127.0.0.1:3000';
+  }
+
   return (
     <Grid container sx={style.container}>
       <Grid item xs={3} sx={style.itemLeft}>
-        <IconButton sx={style.iconButton}>
+        <IconButton sx={style.iconButton} onClick={clickHomeButton}>
           <Home />
         </IconButton>
       </Grid>
@@ -149,12 +174,12 @@ export default function Head({
           disabled
           value={
             selectedQuestionId
-              ? `${questionList[selectedQuestionId]?.deadline} 까지`
+              ? `${deadlineDate[0]} 일 ${deadlineDate[1]} 시간 ${deadlineDate[2]} 분 남았습니다.`
               : '제출기한'
           }
           InputProps={{ sx: style.Input }}
           inputProps={{ sx: style.input }}
-          sx={style.textField}
+          sx={{ ...style.textField, width: 600 }}
         />
         <IconButton sx={style.iconButton}>
           <Settings />

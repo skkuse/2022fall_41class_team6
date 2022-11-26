@@ -35,6 +35,7 @@ export default function App() {
   const [testcaseList, setTestcaseList] = useState({});
   const [codeSavedList, setCodeSavedList] = useState({});
   const [codeSavedIdList, setCodeSavedIdList] = useState({});
+  const [deadlineDate, setDeadlineDate] = useState({});
 
   const toggleLeftWidth = () => {
     setLeftWidth(leftWidth === 3 ? 1 : 3);
@@ -58,6 +59,8 @@ export default function App() {
           setSelectedQuestionId={setSelectedQuestionId}
           testcaseList={testcaseList}
           setTestcaseList={setTestcaseList}
+          deadlineDate={deadlineDate}
+          setDeadlineDate={setDeadlineDate}
         />
         <Grid container sx={style.container}>
           <Grid item xs={leftWidth}>
