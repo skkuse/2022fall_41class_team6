@@ -10,7 +10,7 @@ import os,sys
 import copydetect
 import decimal
 import openai
-
+import traceback
 
 
 # Create your views here.
@@ -494,3 +494,63 @@ def unittestApi(request, testcase_id = 0, id = 0):
         return JsonResponse(testfile.read()[0], safe = False)
 
     return JsonResponse("only GET method is available", safe = False)
+
+@csrf_exempt
+def codeExecutionApi(request, question_id = 0):
+    # read first testcase and make input file to test data complexity
+    testcase = Testcase.objects.filter(questionId = question_id)[0]
+    testcase_serializer = Testcase_Serializer(testcase)
+    inputdata = testcase_serializer.data["input"]
+    with open("./temp/testinput.txt", "w") as tifile:
+        tifile.write(inputdata)
+
+    def logger():
+        error = traceback.format_exc()
+        return str(error)
+
+    usercode = request.GET['code']
+    outdict = {
+            "error" : 0,
+            "errline" : 0,
+            "output" : ""
+            }
+    loaded = False
+    executed = False
+    errmsg = "default errmsg"
+
+    with open("./temp/usercode.py", "w") as f:
+        f.write(usercode)
+
+    try:
+        from usercode import solution
+        loaded = True
+    except:
+        errmsg = logger()
+        loaded = False
+
+    if(loaded):
+        # make file to execute
+        execf = open("./temp/exectemp.py", 'w')
+        execf.write(usercode)
+        execf.write("\nsolution()\n")
+        execf.close()
+
+        try:
+            command = "python3 ./temp/exectemp.py < ./temp/testinput.txt > ./temp/execout.txt"
+            os.system(command)
+            executed = True
+        except:
+            errmsg = logger()
+            executed = False
+
+    if (loaded == True) and (executed == True):
+        outdict["error"] = 0
+        with open("./temp/execout.txt", "r") as f:
+            output = f.read()
+            outdict["output"] = output
+    else:
+        outdict["error"] = 1
+        outdict["output"] = errmsg
+    
+    return JsonResponse(outdict, safe = False)
+
