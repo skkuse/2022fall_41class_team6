@@ -486,7 +486,7 @@ def unittestApi(request, testcase_id = 0, id = 0):
         testfile.close()
 
         # do unittest and save as temp/unittestresult.txt
-        terminal_command = "python -m unittest ./mainApp/myunittest.py 2> ./temp/unittestresult.txt"
+        terminal_command = "python3 -m unittest ./mainApp/myunittest.py 2> ./temp/unittestresult.txt"
         os.system(terminal_command)
 
         # correct "." wrong "F" error "E"
