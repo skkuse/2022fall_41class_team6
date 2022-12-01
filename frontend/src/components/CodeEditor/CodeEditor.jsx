@@ -73,6 +73,7 @@ export default function CodeEditor({
   
 }) {
   let [cnt, letCnt] = useState(0);
+  let [change, letChange] = useState(0);
 
   // 저장된 코드 불러오기 기능
   useEffect( ()=> {
@@ -90,7 +91,7 @@ export default function CodeEditor({
       setCodeSavedList(newCodeSavedList);
       setCodeSavedIdList(newCodeSavedIdList);
     });
-  },[question, cnt]);
+  },[question, cnt, change]);
 
   //코드 저장 기능
   useEffect(()=>{
@@ -128,6 +129,7 @@ export default function CodeEditor({
       }})
       .then(function (response) {
         console.log(response);
+        letChange(++change);
       })
       .catch(function (error) {
         console.log(error.response.data);
@@ -284,9 +286,9 @@ export default function CodeEditor({
                 </Typography>
                 <Button variant="outlined" size="small" sx={style.button} onClick={() => handleSaveCode(1)}>
                   1번</Button>
-                <Button variant="outlined" size="small" sx={style.button} onClick={() => handleSaveCode(2)} disabled = {codeSavedIdList[1] ? false : true}>
+                <Button variant="outlined" size="small" sx={style.button} onClick={() => handleSaveCode(2)} disabled = {codeSavedIdList[0] ? false : true}>
                   2번</Button>
-                <Button variant="outlined" size="small" sx={style.button} onClick={() => handleSaveCode(3)} disabled = {codeSavedIdList[2] ? false : true}>
+                <Button variant="outlined" size="small" sx={style.button} onClick={() => handleSaveCode(3)} disabled = {codeSavedIdList[1] ? false : true}>
                   3번</Button>
               </Box>
             </Modal>
@@ -299,3 +301,5 @@ export default function CodeEditor({
     </Grid>
   );
 }
+
+// 실시간 코드 저장 기능 구현
