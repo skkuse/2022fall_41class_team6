@@ -23,7 +23,7 @@ const style = {
     width: 160,
   },
   score: {
-    width: 30,
+    width: 40,
   },
 };
 
