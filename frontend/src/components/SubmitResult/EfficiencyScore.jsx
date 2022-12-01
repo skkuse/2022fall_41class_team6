@@ -52,17 +52,14 @@ export default function EfficiencyScore({ score }) {
             점
           </Grid>
           <Grid item>
-            <IconButton
-              size="small"
-              onClick={(event) => handlePopoverOpen(event, key)}
-            >
+            <IconButton size="small" onClick={(event) => handlePopoverOpen(event, key)}>
               <Grading />
             </IconButton>
             <Popover
               anchorEl={anchorEl}
               open={open === key}
               onClose={handlePopoverClose}
-              anchorOrigin={{ vertical: 'bottom' }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
               <Box sx={{ p: 1 }}>
                 <Box>
