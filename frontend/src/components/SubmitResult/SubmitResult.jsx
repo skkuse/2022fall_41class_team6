@@ -3,6 +3,7 @@ import axios from 'axios';
 import {
   Backdrop, CircularProgress, Grid, Tab, Tabs,
 } from '@mui/material';
+import FunctionalityScore from './FunctionalityScore';
 import EfficiencyScore from './EfficiencyScore';
 import VisibilityScore from './VisibilityScore';
 
@@ -48,21 +49,40 @@ export default function SubmitResult() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [loading, setLoading] = useState(true);
   const [plagiarismRate, setPlagiarismRate] = useState(0);
+  const [testcaseList, setTestcaseList] = useState([]);
+  const [functionalityScore, setFunctionalityScore] = useState([]);
   const [efficiencyScore, setEfficiencyScore] = useState({});
   const [visibilityScore, setVisibilityScore] = useState({});
 
   useEffect(() => {
     Promise.all([
+      axios.get('/testcase/1/'),
       axios.get('/code_submitted/1/1/plagiarism'),
       axios.get('/code_submitted/1/1/efficiency'),
       axios.get('/code_submitted/1/1/visibility'),
-    ]).then(([{ data: plagiarism }, { data: efficiency }, { data: visibility }]) => {
-      setPlagiarismRate(plagiarism);
-      setEfficiencyScore(efficiency);
-      setVisibilityScore(visibility);
-      setLoading(false);
-    });
+    ]).then(
+      ([{ data: testcases }, { data: plagiarism }, { data: efficiency }, { data: visibility }]) => {
+        setTestcaseList(testcases.map(({ testcaseId }) => testcaseId));
+        setPlagiarismRate(plagiarism);
+        setEfficiencyScore(efficiency);
+        setVisibilityScore(visibility);
+      },
+    );
   }, []);
+
+  useEffect(() => {
+    if (testcaseList.length) {
+      const unittestResult = testcaseList.reduce(async (prev, testcaseId) => {
+        const prevResult = await prev;
+        const { data } = await axios.get(`/code_submitted/${testcaseId}/1/unittest`);
+        return [...prevResult, data];
+      }, Promise.resolve([]));
+      unittestResult.then((result) => {
+        setFunctionalityScore(result);
+        setLoading(false);
+      });
+    }
+  }, [testcaseList]);
 
   const handleTabChange = (_, newSelectedTab) => {
     setSelectedTab(newSelectedTab);
@@ -92,7 +112,7 @@ export default function SubmitResult() {
         </Tabs>
       </Grid>
       <Grid item sx={style.content}>
-        {selectedTab === 0 && <div>기능</div>}
+        {selectedTab === 0 && <FunctionalityScore score={functionalityScore} />}
         {selectedTab === 1 && <EfficiencyScore score={efficiencyScore} />}
         {selectedTab === 2 && <VisibilityScore score={visibilityScore} />}
       </Grid>

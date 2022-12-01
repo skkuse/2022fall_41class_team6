@@ -57,7 +57,7 @@ export default function VisibilityScore({ score }) {
                 anchorEl={anchorEl}
                 open={open === key}
                 onClose={handlePopoverClose}
-                anchorOrigin={{ vertical: 'bottom' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
               >
                 <Box sx={{ p: 1 }}>
                   {score[key].slice(1).map((item) => (
