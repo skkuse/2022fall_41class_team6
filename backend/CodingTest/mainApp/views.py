@@ -492,8 +492,81 @@ def unittestApi(request, testcase_id = 0, id = 0):
         # correct "." wrong "F" error "E"
         testfile = open('./temp/unittestresult.txt', 'r')
         return JsonResponse(testfile.read()[0], safe = False)
-
     return JsonResponse("only GET method is available", safe = False)
+
+@csrf_exempt
+def unittestApi2(request, testcase_id = 0):
+    # make dictionary for output
+    outdict = {
+            "pass" : "",
+            "testinput" : "",
+            "testoutput" : "",
+            "youroutput" : ""
+            }
+
+    # if the method is not POST, return error message
+    if request.method != 'POST':
+        errmsg = "only POST method is available!"
+        for i in outdict:
+            outdict[i] = errmsg
+        return JsonResponse(outdict)
+
+    # get user's code from request. key = "code", value = the code that user writed
+    testcode = request.POST.get("code")
+
+    # get testcase input, output
+    testcase = Testcase.objects.filter(testcaseId = testcase_id)
+    testcase_serializer = Testcase_Serializer(testcase, many = True)
+    tinput = testcase_serializer.data[0]["input"].replace('\r', '')
+    output = testcase_serializer.data[0]["output"].replace('\r', '')
+
+    # export code to temp/testcode.py
+    testfile = open('./temp/testcode.py', 'w')
+    testfile.write(testcode)
+    testfile.write("\nprint(solution(), end='')")
+    testfile.close()
+
+    # export code to temp/input.txt
+    testfile = open('./temp/input.txt', 'w')
+    testfile.write(tinput)
+    testfile.close()
+
+    # export code to temp/output.txt
+    testfile = open('./temp/output.txt', 'w')
+    testfile.write(output)
+    testfile.close()
+
+    # refine answer output
+    file = open('./temp/output.txt', 'r')
+    right_ans = file.read().split('\n')
+    if len(right_ans) == 1:
+        right_ans = int(right_ans[0])
+    else:
+        right_ans = tuple(map(int, right_ans))
+    file.close()
+    right_ans = str(right_ans)
+
+    # get user output
+    command = "python3 ./temp/testcode.py < ./temp/input.txt > ./temp/useroutput.txt 2>&1"
+    os.system(command)
+    
+    # get user output
+    user_output_file = open('./temp/useroutput.txt', 'r')
+    user_output = user_output_file.read()
+    user_output_file.close()
+
+    # compare outputs and check pass
+    if right_ans == user_output:
+        outdict["pass"] = 1
+    else:
+        outdict["pass"] = 0
+
+    # update output
+    outdict["testinput"] = tinput
+    outdict["testoutput"] = right_ans
+    outdict["youroutput"] = user_output
+
+    return JsonResponse(outdict)
 
 @csrf_exempt
 def codeExecutionApi(request, question_id = 0):
