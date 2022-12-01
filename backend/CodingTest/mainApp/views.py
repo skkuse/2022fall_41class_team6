@@ -183,11 +183,11 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
         tempfile.close()
 
         # do multimetric for submitted code and save as ./temp/efficiency.json
-        terminal_command = "multimetric ./temp/tempcode.py | tee ./temp/efficiency.json"
+        terminal_command = "multimetric ./temp/tempcode.py > ./temp/efficiency.json"
         os.system(terminal_command)
 
         # do multimetric for answer code and save as ./temp/answereff.json
-        terminal_command = "multimetric ./temp/answercode.py | tee ./temp/answereff.json"
+        terminal_command = "multimetric ./temp/answercode.py > ./temp/answereff.json"
         os.system(terminal_command)
 
         # get data from files
@@ -259,10 +259,10 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
 
         # run file with memory profiler and give testcase input
         # then log as ./temp/dataout.txt
-        tc = "python3 -m memory_profiler ./temp/datatemp.py < ./temp/testinput.txt | tee ./temp/dataout.txt"
+        tc = "python3 -m memory_profiler ./temp/datatemp.py < ./temp/testinput.txt > ./temp/dataout.txt"
         os.system(tc)
         # repeat with answer code
-        tc = "python3 -m memory_profiler ./temp/datatemp_ans.py < ./temp/testinput.txt | tee ./temp/dataout_ans.txt"
+        tc = "python3 -m memory_profiler ./temp/datatemp_ans.py < ./temp/testinput.txt > ./temp/dataout_ans.txt"
         os.system(tc)
 
         # parse logfile and pick maximum memory usage
