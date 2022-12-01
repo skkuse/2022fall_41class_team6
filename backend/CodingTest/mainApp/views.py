@@ -497,6 +497,12 @@ def unittestApi(request, testcase_id = 0, id = 0):
 
 @csrf_exempt
 def codeExecutionApi(request, question_id = 0):
+    if request.method != 'POST':
+        outdict = {
+                "output" : "Use POST request"
+                }
+        return JsonResponse(outdict)
+
     # read first testcase and make input file to test data complexity
     testcase = Testcase.objects.filter(questionId = question_id)[0]
     testcase_serializer = Testcase_Serializer(testcase)
@@ -504,20 +510,18 @@ def codeExecutionApi(request, question_id = 0):
     with open("./temp/testinput.txt", "w") as tifile:
         tifile.write(inputdata)
 
-    usercode = request.GET['code']
+    usercode = request.POST.get("code")
     outdict = {
             "output" : ""
             }
 
-    with open("./temp/usercode.py", "w") as f:
-        f.write(usercode)
-
     # make file to execute
     execf = open("./temp/exectemp.py", 'w')
     execf.write(usercode)
-    execf.write("\nsolution()\n")
+    execf.write("\nprint(solution(), end='')\n")
     execf.close()
 
+    # execute and redirect stdout,stderr to execout.txt
     command = "python3 ./temp/exectemp.py < ./temp/testinput.txt > ./temp/execout.txt 2>&1"
     os.system(command)
 
@@ -526,5 +530,5 @@ def codeExecutionApi(request, question_id = 0):
 
     outdict["output"] = outtxt
     
-    return JsonResponse(outdict, safe = False)
+    return JsonResponse(outdict)
 
