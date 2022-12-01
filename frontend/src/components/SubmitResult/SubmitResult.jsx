@@ -9,7 +9,7 @@ import VisibilityScore from './VisibilityScore';
 const style = {
   container: {
     position: 'relative',
-    height: 'calc(100vh - 50px)',
+    height: 221,
     flexWrap: 'nowrap',
     overflow: 'auto',
   },
