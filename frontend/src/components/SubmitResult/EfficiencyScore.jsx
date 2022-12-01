@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Box } from '@mui/material';
+import {
+  Box, Grid, IconButton, Popover,
+} from '@mui/material';
+import { Grading } from '@mui/icons-material';
 
 const SCORE_HEADER = {
   line_of_codes: 'Line of Codes',
@@ -11,16 +14,33 @@ const SCORE_HEADER = {
 
 const style = {
   container: {
-    display: 'flex',
+    height: 30,
     justifyContent: 'center',
-    'td:first-child': {
-      width: 200,
-    },
+    alignItems: 'center',
+    fontSize: 14,
+  },
+  key: {
+    width: 160,
+  },
+  score: {
+    width: 30,
   },
 };
 
 export default function EfficiencyScore() {
   const [score, setScore] = useState({});
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [open, setOpen] = useState('');
+
+  const handlePopoverOpen = (event, key) => {
+    setAnchorEl(event.currentTarget);
+    setOpen(key);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+    setOpen('');
+  };
 
   useEffect(() => {
     axios.get('/code_submitted/1/1/efficiency').then(({ data }) => {
@@ -29,37 +49,45 @@ export default function EfficiencyScore() {
   }, []);
 
   return (
-    <Box sx={style.container}>
-      <table>
-        <tr>
-          <td>Line of Codes</td>
-          <td>
-            {score.locscore}
+    <Grid container direction="column">
+      {Object.keys(score).map((key) => (
+        <Grid key={key} item container sx={style.container}>
+          <Grid item sx={style.key}>
+            {SCORE_HEADER[key]}
+          </Grid>
+          <Grid item sx={style.score}>
+            {score[key][0]}
             점
-          </td>
-        </tr>
-        <tr>
-          <td>Halstead</td>
-          <td>
-            {score.halsted}
-            점
-          </td>
-        </tr>
-        <tr>
-          <td>Data Flow Complexity</td>
-          <td>
-            {score.dataflow_complexity}
-            점
-          </td>
-        </tr>
-        <tr>
-          <td>Control Flow Complexity</td>
-          <td>
-            {score.controlflow_complexity}
-            점
-          </td>
-        </tr>
-      </table>
-    </Box>
+          </Grid>
+          <Grid item>
+            <IconButton
+              size="small"
+              onClick={(event) => handlePopoverOpen(event, key)}
+            >
+              <Grading />
+            </IconButton>
+            <Popover
+              anchorEl={anchorEl}
+              open={open === key}
+              onClose={handlePopoverClose}
+              anchorOrigin={{ vertical: 'bottom' }}
+            >
+              <Box sx={{ p: 1 }}>
+                <Box>
+                  내가 제출한 코드 -
+                  {' '}
+                  {score[key][2]}
+                </Box>
+                <Box>
+                  정답 코드 -
+                  {' '}
+                  {score[key][1]}
+                </Box>
+              </Box>
+            </Popover>
+          </Grid>
+        </Grid>
+      ))}
+    </Grid>
   );
 }
