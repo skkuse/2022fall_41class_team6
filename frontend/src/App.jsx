@@ -6,6 +6,7 @@ import {
 import { Head } from './components/Head';
 import { CodeEditor } from './components/CodeEditor';
 import { QuestionInfo } from './components/QuestionInfo';
+import { SubmitResult } from './components/SubmitResult';
 
 const theme = createTheme({
   palette: {
@@ -79,7 +80,9 @@ export default function App() {
               setCodeSavedIdList={setCodeSavedIdList}
             />
           </Grid>
-          <Grid item xs={rightWidth} />
+          <Grid item xs={rightWidth}>
+            <SubmitResult />
+          </Grid>
         </Grid>
       </ThemeProvider>
     </CssBaseline>
