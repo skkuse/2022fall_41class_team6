@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
-  Backdrop, Grid, Tab, Tabs,
+  Backdrop, CircularProgress, Grid, Tab, Tabs,
 } from '@mui/material';
 import EfficiencyScore from './EfficiencyScore';
 import VisibilityScore from './VisibilityScore';
 
 const style = {
   container: {
+    position: 'relative',
     height: 'calc(100vh - 50px)',
     flexWrap: 'nowrap',
     overflow: 'auto',
@@ -32,6 +33,12 @@ const style = {
     minHeight: 0,
     p: 1,
   },
+  backdrop: {
+    position: 'absolute',
+    top: 40,
+    height: 181,
+    zIndex: 1,
+  },
 };
 
 export default function SubmitResult() {
@@ -43,7 +50,8 @@ export default function SubmitResult() {
 
   useEffect(() => {
     Promise.all([
-      axios.get('/code_submitted/1/1/efficiency'), axios.get('/code_submitted/1/1/visibility'),
+      axios.get('/code_submitted/1/1/efficiency'),
+      axios.get('/code_submitted/1/1/visibility'),
     ]).then(([{ data: efficiency }, { data: visibility }]) => {
       setEfficiencyScore(efficiency);
       setVisibilityScore(visibility);
@@ -68,7 +76,9 @@ export default function SubmitResult() {
           %
         </Grid>
       </Grid>
-      <Grid item>종합 점수</Grid>
+      <Backdrop open={loading} sx={style.backdrop}>
+        <CircularProgress />
+      </Backdrop>
       <Grid item>
         <Tabs variant="fullWidth" sx={style.tabs} value={selectedTab} onChange={handleTabChange}>
           <Tab wrapped sx={style.tab} label="기능" />
