@@ -1,11 +1,13 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import {
-  createTheme, CssBaseline, Grid, ThemeProvider,
+  createTheme, CssBaseline, Grid, Stack, ThemeProvider,
 } from '@mui/material';
 import { Head } from './components/Head';
 import { CodeEditor } from './components/CodeEditor';
 import { QuestionInfo } from './components/QuestionInfo';
+import { SubmitResult } from './components/SubmitResult';
+import { CodeExplanation } from './components/CodeExplanation';
 
 const theme = createTheme({
   palette: {
@@ -64,10 +66,7 @@ export default function App() {
         />
         <Grid container sx={style.container}>
           <Grid item xs={leftWidth}>
-            <QuestionInfo
-              question={questionList[selectedQuestionId]}
-              testcaseList={testcaseList}
-            />
+            <QuestionInfo question={questionList[selectedQuestionId]} testcaseList={testcaseList} />
           </Grid>
           <Grid item xs={12 - leftWidth - rightWidth} sx={style.itemCenter}>
             <CodeEditor
@@ -79,7 +78,10 @@ export default function App() {
               setCodeSavedIdList={setCodeSavedIdList}
             />
           </Grid>
-          <Grid item xs={rightWidth} />
+          <Grid item xs={rightWidth}>
+            <SubmitResult />
+            <CodeExplanation />
+          </Grid>
         </Grid>
       </ThemeProvider>
     </CssBaseline>
