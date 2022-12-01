@@ -1,5 +1,13 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Box } from '@mui/material';
-import React, { useState } from 'react';
+
+const SCORE_HEADER = {
+  line_of_codes: 'Line of Codes',
+  halstead_difficulty: 'Halstead Difficulty',
+  dataflow_complexity: 'Dataflow Complexity',
+  controlflow_complexity: 'Controlflow Complexity',
+};
 
 const style = {
   container: {
@@ -12,12 +20,13 @@ const style = {
 };
 
 export default function EfficiencyScore() {
-  const [score, setScore] = useState({
-    locscore: 24,
-    halsted: 96,
-    dataflow_complexity: 25,
-    controlflow_complexity: 25,
-  });
+  const [score, setScore] = useState({});
+
+  useEffect(() => {
+    axios.get('/code_submitted/1/1/efficiency').then(({ data }) => {
+      setScore(data);
+    });
+  }, []);
 
   return (
     <Box sx={style.container}>
