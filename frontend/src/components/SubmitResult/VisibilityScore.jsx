@@ -17,11 +17,6 @@ const style = {
   score: {
     width: 50,
   },
-  icon: {
-    display: 'flex',
-    alignItems: 'center',
-    fontSize: 16,
-  },
 };
 
 export default function VisibilityScore() {
