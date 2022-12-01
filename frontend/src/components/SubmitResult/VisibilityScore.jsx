@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import {
   Box, Grid, IconButton, Popover,
 } from '@mui/material';
@@ -20,8 +19,7 @@ const style = {
   },
 };
 
-export default function VisibilityScore() {
-  const [score, setScore] = useState({});
+export default function VisibilityScore({ score }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState('');
 
@@ -34,12 +32,6 @@ export default function VisibilityScore() {
     setAnchorEl(null);
     setOpen('');
   };
-
-  useEffect(() => {
-    axios.get('/code_submitted/1/1/visibility').then(({ data }) => {
-      setScore(data);
-    });
-  }, []);
 
   return (
     <Grid container direction="column">

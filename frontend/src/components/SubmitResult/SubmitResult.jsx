@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
-import { Grid, Tab, Tabs } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import {
+  Backdrop, Grid, Tab, Tabs,
+} from '@mui/material';
 import EfficiencyScore from './EfficiencyScore';
 import VisibilityScore from './VisibilityScore';
 
@@ -33,7 +36,20 @@ const style = {
 
 export default function SubmitResult() {
   const [selectedTab, setSelectedTab] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [plagiarismRate, setPlagiarismRate] = useState(0);
+  const [efficiencyScore, setEfficiencyScore] = useState({});
+  const [visibilityScore, setVisibilityScore] = useState({});
+
+  useEffect(() => {
+    Promise.all([
+      axios.get('/code_submitted/1/1/efficiency'), axios.get('/code_submitted/1/1/visibility'),
+    ]).then(([{ data: efficiency }, { data: visibility }]) => {
+      setEfficiencyScore(efficiency);
+      setVisibilityScore(visibility);
+      setLoading(false);
+    });
+  }, []);
 
   const handleTabChange = (_, newSelectedTab) => {
     setSelectedTab(newSelectedTab);
@@ -62,8 +78,8 @@ export default function SubmitResult() {
       </Grid>
       <Grid item>
         {selectedTab === 0 && <div>기능</div>}
-        {selectedTab === 1 && <EfficiencyScore />}
-        {selectedTab === 2 && <VisibilityScore />}
+        {selectedTab === 1 && <EfficiencyScore score={efficiencyScore} />}
+        {selectedTab === 2 && <VisibilityScore score={visibilityScore} />}
       </Grid>
     </Grid>
   );
