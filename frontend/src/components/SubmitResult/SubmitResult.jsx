@@ -11,12 +11,15 @@ const style = {
   },
   header: {
     height: 40,
-    pl: 1,
+    px: 1,
     flex: '0 0 auto',
     display: 'flex',
     alignItems: 'center',
     color: 'white',
     bgcolor: 'primary.main',
+  },
+  plagiarismRate: {
+    fontSize: 14,
   },
   tabs: {
     minHeight: 0,
@@ -30,6 +33,7 @@ const style = {
 
 export default function SubmitResult() {
   const [selectedTab, setSelectedTab] = useState(0);
+  const [plagiarismRate, setPlagiarismRate] = useState(0);
 
   const handleTabChange = (_, newSelectedTab) => {
     setSelectedTab(newSelectedTab);
@@ -37,17 +41,20 @@ export default function SubmitResult() {
 
   return (
     <Grid container direction="column" sx={style.container}>
-      <Grid item sx={style.header}>
-        제출 결과
+      <Grid item container sx={style.header}>
+        <Grid item xs>
+          제출 결과
+        </Grid>
+        <Grid item sx={{ ...style.plagiarismRate, color: plagiarismRate > 10 ? 'red' : 'green' }}>
+          표절율
+          {' '}
+          {plagiarismRate}
+          %
+        </Grid>
       </Grid>
       <Grid item>종합 점수</Grid>
       <Grid item>
-        <Tabs
-          variant="fullWidth"
-          sx={style.tabs}
-          value={selectedTab}
-          onChange={handleTabChange}
-        >
+        <Tabs variant="fullWidth" sx={style.tabs} value={selectedTab} onChange={handleTabChange}>
           <Tab wrapped sx={style.tab} label="기능" />
           <Tab wrapped sx={style.tab} label="효율" />
           <Tab wrapped sx={style.tab} label="가독성" />

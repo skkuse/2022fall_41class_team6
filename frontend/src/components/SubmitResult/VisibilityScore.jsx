@@ -10,12 +10,13 @@ const style = {
     height: 30,
     justifyContent: 'center',
     alignItems: 'center',
+    fontSize: 14,
   },
   key: {
-    width: 100,
+    width: 90,
   },
   score: {
-    width: 50,
+    width: 40,
   },
 };
 
@@ -53,6 +54,7 @@ export default function VisibilityScore() {
           </Grid>
           <Grid item>
             <IconButton
+              size="small"
               disabled={score[key].length === 1}
               onClick={(event) => handlePopoverOpen(event, key)}
             >
