@@ -9,7 +9,7 @@ import VisibilityScore from './VisibilityScore';
 const style = {
   container: {
     position: 'relative',
-    height: 221,
+    height: 237,
     flexWrap: 'nowrap',
     overflow: 'auto',
   },
@@ -33,10 +33,13 @@ const style = {
     minHeight: 0,
     p: 1,
   },
+  content: {
+    py: 1,
+  },
   backdrop: {
     position: 'absolute',
     top: 40,
-    height: 181,
+    height: 197,
     zIndex: 1,
   },
 };
@@ -88,7 +91,7 @@ export default function SubmitResult() {
           <Tab wrapped sx={style.tab} label="가독성" />
         </Tabs>
       </Grid>
-      <Grid item>
+      <Grid item sx={style.content}>
         {selectedTab === 0 && <div>기능</div>}
         {selectedTab === 1 && <EfficiencyScore score={efficiencyScore} />}
         {selectedTab === 2 && <VisibilityScore score={visibilityScore} />}
