@@ -28,12 +28,12 @@ class Testcase(models.Model):
     isHidden = models.BooleanField(default = False)
 
 class Code_Saved(models.Model):
-    code_savedId = models.IntegerField(primary_key = True)
+    code_savedId = models.IntegerField(default = 0)
     questionId = models.ForeignKey(Question, on_delete = models.CASCADE)
     code = models.TextField(default = '')
 
 class Code_Submitted(models.Model): 
-    code_submittedId = models.IntegerField(primary_key = True)
+    code_submittedId = models.IntegerField(default = 0)
     questionId = models.ForeignKey(Question, on_delete = models.CASCADE)
-    sub_date = models.DateField(null = True)
+    sub_date = models.DateTimeField(null = True)
     code = models.TextField(default = '')

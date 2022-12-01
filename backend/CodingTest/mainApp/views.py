@@ -1,6 +1,7 @@
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
+from django.utils import timezone
 
 from mainApp.models import *
 from mainApp.serializers import *
@@ -143,8 +144,21 @@ def code_submittedApi(request, question_id = 0, id=0):
         code_submitted_serializer = Code_Submitted_Serializer(code_submitted, many = True)
         return JsonResponse(code_submitted_serializer.data, safe = False)
     elif request.method == 'POST':
+        code_submitted_list = Code_Submitted.objects.filter(questionId = question_id)
         code_submitted_data = JSONParser().parse(request)
+        code_submitted_data["questionId"] = question_id
+        code_submitted_data["sub_date"] = timezone.now()
         code_submitted_serializer = Code_Submitted_Serializer(data = code_submitted_data)
+        ## debugging
+        for submits in code_submitted_list:
+            print(submits.code_submittedId)
+        '''
+        if code_submitted_serializer.is_valid():
+            tval = code_submitted_serializer.validated_data["code_submittedId"]
+            print("tval: ", end='')
+            print(tval)
+        '''
+
         if code_submitted_serializer.is_valid():
             code_submitted_serializer.save()
             return JsonResponse("Submitted Code is Successfully Added", safe = False)
