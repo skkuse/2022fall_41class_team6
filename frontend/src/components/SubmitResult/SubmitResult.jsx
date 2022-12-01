@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Grid, Tab, Tabs } from '@mui/material';
 import EfficiencyScore from './EfficiencyScore';
+import VisibilityScore from './VisibilityScore';
 
 const style = {
   container: {
@@ -55,7 +56,7 @@ export default function SubmitResult() {
       <Grid item>
         {selectedTab === 0 && <div>기능</div>}
         {selectedTab === 1 && <EfficiencyScore />}
-        {selectedTab === 2 && <div>가독성</div>}
+        {selectedTab === 2 && <VisibilityScore />}
       </Grid>
     </Grid>
   );
