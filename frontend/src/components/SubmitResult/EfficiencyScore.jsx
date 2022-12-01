@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import {
   Box, Grid, IconButton, Popover,
 } from '@mui/material';
@@ -27,8 +26,7 @@ const style = {
   },
 };
 
-export default function EfficiencyScore() {
-  const [score, setScore] = useState({});
+export default function EfficiencyScore({ score }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState('');
 
@@ -41,12 +39,6 @@ export default function EfficiencyScore() {
     setAnchorEl(null);
     setOpen('');
   };
-
-  useEffect(() => {
-    axios.get('/code_submitted/1/1/efficiency').then(({ data }) => {
-      setScore(data);
-    });
-  }, []);
 
   return (
     <Grid container direction="column">
