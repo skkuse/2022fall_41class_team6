@@ -504,53 +504,27 @@ def codeExecutionApi(request, question_id = 0):
     with open("./temp/testinput.txt", "w") as tifile:
         tifile.write(inputdata)
 
-    def logger():
-        error = traceback.format_exc()
-        return str(error)
-
     usercode = request.GET['code']
     outdict = {
-            "error" : 0,
-            "errline" : 0,
             "output" : ""
             }
-    loaded = False
-    executed = False
-    errmsg = "default errmsg"
 
     with open("./temp/usercode.py", "w") as f:
         f.write(usercode)
 
-    try:
-        from usercode import solution
-        loaded = True
-    except:
-        errmsg = logger()
-        loaded = False
+    # make file to execute
+    execf = open("./temp/exectemp.py", 'w')
+    execf.write(usercode)
+    execf.write("\nsolution()\n")
+    execf.close()
 
-    if(loaded):
-        # make file to execute
-        execf = open("./temp/exectemp.py", 'w')
-        execf.write(usercode)
-        execf.write("\nsolution()\n")
-        execf.close()
+    command = "python3 ./temp/exectemp.py < ./temp/testinput.txt > ./temp/execout.txt 2>&1"
+    os.system(command)
 
-        try:
-            command = "python3 ./temp/exectemp.py < ./temp/testinput.txt > ./temp/execout.txt"
-            os.system(command)
-            executed = True
-        except:
-            errmsg = logger()
-            executed = False
+    with open("./temp/execout.txt", "r") as f:
+        outtxt = f.read()
 
-    if (loaded == True) and (executed == True):
-        outdict["error"] = 0
-        with open("./temp/execout.txt", "r") as f:
-            output = f.read()
-            outdict["output"] = output
-    else:
-        outdict["error"] = 1
-        outdict["output"] = errmsg
+    outdict["output"] = outtxt
     
     return JsonResponse(outdict, safe = False)
 
