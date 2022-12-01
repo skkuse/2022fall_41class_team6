@@ -50,9 +50,11 @@ export default function SubmitResult() {
 
   useEffect(() => {
     Promise.all([
+      axios.get('/code_submitted/1/1/plagiarism'),
       axios.get('/code_submitted/1/1/efficiency'),
       axios.get('/code_submitted/1/1/visibility'),
-    ]).then(([{ data: efficiency }, { data: visibility }]) => {
+    ]).then(([{ data: plagiarism }, { data: efficiency }, { data: visibility }]) => {
+      setPlagiarismRate(plagiarism);
       setEfficiencyScore(efficiency);
       setVisibilityScore(visibility);
       setLoading(false);
