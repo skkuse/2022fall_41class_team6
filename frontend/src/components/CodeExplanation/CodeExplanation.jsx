@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Backdrop, CircularProgress, Grid } from '@mui/material';
 
 const style = {
   container: {
     position: 'relative',
-    height: 221,
+    height: 341,
     flexWrap: 'nowrap',
     overflow: 'auto',
   },
@@ -17,16 +18,29 @@ const style = {
     color: 'white',
     bgcolor: 'primary.main',
   },
+  content: {
+    p: 1,
+    fontSize: 14,
+    whiteSpace: 'pre-wrap',
+  },
   backdrop: {
     position: 'absolute',
     top: 40,
-    height: 181,
+    height: 301,
     zIndex: 1,
   },
 };
 
 export default function CodeExplanation() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [explanation, setExplanation] = useState('');
+
+  useEffect(() => {
+    axios.get('/code_submitted/1/1/explain').then(({ data }) => {
+      setExplanation(data);
+      setLoading(false);
+    });
+  }, []);
 
   return (
     <Grid container direction="column" sx={style.container}>
@@ -36,9 +50,7 @@ export default function CodeExplanation() {
       <Backdrop open={loading} sx={style.backdrop}>
         <CircularProgress />
       </Backdrop>
-      <Grid item>
-        코드 설명
-      </Grid>
+      <Grid item sx={style.content}>{explanation}</Grid>
     </Grid>
   );
 }
