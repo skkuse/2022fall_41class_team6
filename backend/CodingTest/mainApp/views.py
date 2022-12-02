@@ -147,8 +147,9 @@ def code_submittedApi(request, question_id = 0, id=0):
     elif request.method == 'POST':
         outjson = {
                 # 0: no error
-                # 1: error
-                "error" : 1,
+                # 1: submit count exceed
+                # 2: other errors
+                "error" : 2,
                 "code_submittedId" : 0,
                 "errormsg" : "undefined error"
                 }
@@ -194,6 +195,7 @@ def code_submittedApi(request, question_id = 0, id=0):
 
         # submit count >= 3 case
         else:
+            outjson["error"] = 1
             outjson["errormsg"] = "submit count exceeded"
             return JsonResponse(outjson)
 
