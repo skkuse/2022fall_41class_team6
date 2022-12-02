@@ -109,11 +109,17 @@ export default function Head({
     const deadline = moment(setTime, 'YYYY-MM-DD');
     const nowTime = moment();
 
-    const dayleft = deadline.diff(nowTime, 'days');
+    const late = nowTime.isAfter(deadline);
+    const dLeft = deadline.diff(nowTime, 'days');
+    const hLeft = 23 - new Date().getHours();
+    const mLeft = 59 - new Date().getMinutes();
 
-    newTimeLeft[0] = `${dayleft}`;
-    newTimeLeft[1] = 23 - new Date().getHours();
-    newTimeLeft[2] = 59 - new Date().getMinutes();
+    if(late){
+      newTimeLeft[0] = "지각제출";
+    }
+    else{
+      newTimeLeft[0] = dLeft + "일 " + hLeft + "시간 " + mLeft + "분 남았습니다.";
+    }
 
     setDeadlineDate(newTimeLeft);
   }, [selectedQuestionId, new Date()]);
@@ -174,7 +180,7 @@ export default function Head({
           disabled
           value={
             selectedQuestionId
-              ? `${deadlineDate[0]} 일 ${deadlineDate[1]} 시간 ${deadlineDate[2]} 분 남았습니다.`
+              ? `${deadlineDate[0]}`
               : '제출기한'
           }
           InputProps={{ sx: style.Input }}
