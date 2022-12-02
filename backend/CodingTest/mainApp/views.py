@@ -1,6 +1,7 @@
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
+from django.utils import timezone
 
 from mainApp.models import *
 from mainApp.serializers import *
@@ -140,27 +141,73 @@ def code_submittedApi(request, question_id = 0, id=0):
             code_submitted = Code_Submitted.objects.filter(questionId = question_id)
         else: # 'code_submitted/<question id>/' case
             code_submitted = Code_Submitted.objects.filter(questionId = question_id, code_submittedId = id)
+
         code_submitted_serializer = Code_Submitted_Serializer(code_submitted, many = True)
         return JsonResponse(code_submitted_serializer.data, safe = False)
     elif request.method == 'POST':
+        outjson = {
+                # 0: no error
+                # 1: error
+                "error" : 1,
+                "code_submittedId" : 0,
+                "errormsg" : "undefined error"
+                }
+
+        # get code from POST request
         code_submitted_data = JSONParser().parse(request)
-        code_submitted_serializer = Code_Submitted_Serializer(data = code_submitted_data)
-        if code_submitted_serializer.is_valid():
-            code_submitted_serializer.save()
-            return JsonResponse("Submitted Code is Successfully Added", safe = False)
-        return JsonResponse("Fail to Add", safe = False)
+
+        # if there are no code in Json input, raise error
+        try:
+            code_submitted_data["code"]
+        except:
+            outjson["errormsg"] = "no code in json"
+            return JsonResponse(outjson)
+
+        # set data
+        code_submitted_data["questionId"] = question_id
+        code_submitted_data["sub_date"] = timezone.localdate()
+        
+        # check submit count
+        code_submitted_this_question = Code_Submitted.objects.filter(questionId = question_id)
+        submit_count = len(code_submitted_this_question)
+
+        # submit count left
+        if submit_count < 3:
+            # get valid id
+            validid = Code_Submitted.objects.order_by("code_submittedId").last().code_submittedId + 1
+            code_submitted_data["code_submittedId"] = validid
+
+            # serialize
+            code_submitted_serializer = Code_Submitted_Serializer(data = code_submitted_data)
+            # if serializer is valid add to db
+            if code_submitted_serializer.is_valid():
+                outjson["error"] = 0
+                outjson["code_submittedId"] = validid
+                outjson["errormsg"] = ""
+                code_submitted_serializer.save()
+                return JsonResponse(outjson)
+
+            # if serializer is not valid return error
+            else:
+                outjson["errormsg"] = "invalid data"
+                return JsonResponse(outjson)
+
+        # submit count >= 3 case
+        else:
+            outjson["errormsg"] = "submit count exceeded"
+            return JsonResponse(outjson)
+
+        # undefined error case
+        return JsonResponse(outjson)
+
     elif request.method == 'PUT':
-        code_submitted_data = JSONParser().parse(request)
-        code_submitted = Code_Submitted.objects.get(code_submittedId = code_submitted_data['code_submittedId'], questionId = code_submitted_data['questionId'])
-        code_submitted_serializer = Code_Submitted_Serializer(code_submitted, data = code_submitted_data)
-        if code_submitted_serializer.is_valid():
-            code_submitted_serializer.save()
-            return JsonResponse("Submitted Code is Update Successfully", safe = False)
-        return JsonResponse("Fail to Update", safe = False)
+        return JsonResponse("PUT method not available", safe = False)
+
     elif request.method == 'DELETE':
-        code_submitted = Question.objects.get(questionId = question_id, code_submittedId = id)
+        code_submitted = Code_Submitted.objects.get(questionId = question_id, code_submittedId = id)
         code_submitted.delete()
         return JsonResponse("Deleted Successfully", safe = False)
+
 @csrf_exempt 
 def codeEfficiencyApi(request, question_id = 0, id=0):
     if request.method == 'GET':
