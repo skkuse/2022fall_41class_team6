@@ -67,10 +67,13 @@ export default function CodeEditor({
   questionid,
   setCodeSavedList,
   codeSavedList,
-  codesaved,
+  // codesaved,
   codeSavedIdList,
   setCodeSavedIdList,
-  
+  setSubmittedCodeId,
+  setErrorCode,
+  errorCode,
+  submittedCodeId,
 }) {
   let [cnt, letCnt] = useState(0);
   let [change, letChange] = useState(0);
@@ -199,6 +202,28 @@ export default function CodeEditor({
     saveAs(blob, 'temp.py');
   }
 
+  // 코드 제출 버튼
+  function handleSubmitCode(){
+    let val = String(editorRef.current.getValue());;
+    if(!val){
+      alert("작성된 코드가 없습니다. ");
+    }
+      axios.post('/code_submitted/'+String(questionid)+'/', {
+        code : val,
+      },
+      { headers : {
+        "Content-Type":"application/json", 
+        'Accept':'application/json'
+      }})
+      .then((response) => {
+        setSubmittedCodeId(response.data.code_submittedId);
+        setErrorCode(response.data.error);
+      })
+      .catch(function (error) {
+        console.log(error.response.data);
+      });
+  }
+
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -292,7 +317,7 @@ export default function CodeEditor({
                   3번</Button>
               </Box>
             </Modal>
-            <Button variant="contained" size="small" sx={style.submitButton} disabled = {question ? false : true}>
+            <Button variant="contained" size="small" sx={style.submitButton} onClick={() => handleSubmitCode()} disabled = {question ? false : true}>
               제출
             </Button>
           </Grid>

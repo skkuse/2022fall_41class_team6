@@ -38,6 +38,8 @@ export default function App() {
   const [codeSavedList, setCodeSavedList] = useState({});
   const [codeSavedIdList, setCodeSavedIdList] = useState({});
   const [deadlineDate, setDeadlineDate] = useState({});
+  const [submittedCodeId, setSubmittedCodeId] = useState({});
+  const [errorCode, setErrorCode] = useState({});
 
   const toggleLeftWidth = () => {
     setLeftWidth(leftWidth === 3 ? 1 : 3);
@@ -76,6 +78,10 @@ export default function App() {
               setCodeSavedList={setCodeSavedList}
               codeSavedIdList={codeSavedIdList}
               setCodeSavedIdList={setCodeSavedIdList}
+              setSubmittedCodeId={setSubmittedCodeId}
+              setErrorCode={setErrorCode}
+              errorCode={errorCode}
+              submittedCodeId={submittedCodeId}
             />
           </Grid>
           <Grid item xs={rightWidth}>
