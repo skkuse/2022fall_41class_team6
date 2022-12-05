@@ -102,6 +102,7 @@ def testcaseApi(request, question_id = 0, id=0):
         testcase = Testcase.objects.get(testcaseId = id)
         testcase.delete()
         return JsonResponse("Testcase is Successfully Deleted", safe = False)
+
 @csrf_exempt
 def code_savedApi(request, question_id = 0, id=0):
     if request.method == 'GET':
@@ -113,13 +114,52 @@ def code_savedApi(request, question_id = 0, id=0):
             code_saved = Code_Saved.objects.filter(questionId = question_id, code_savedId = id)
         code_saved_serializer = Code_Saved_Serializer(code_saved, many = True)
         return JsonResponse(code_saved_serializer.data, safe = False)
+
     elif request.method == 'POST':
+        outjson = {
+                # 0: no error
+                # 1: error
+                "error" : 1,
+                "code_savedId" : 0,
+                "errormsg" : "undefined error"
+                }
+
+        # get code from POST request
         code_saved_data = JSONParser().parse(request)
+
+        # if there are no code in Json input, raise error
+        try:
+            code_saved_data["code"]
+        except:
+            outjson["errormsg"] = "no code in json"
+            return JsonResponse(outjson)
+
+        # set data
+        code_saved_data["questionId"] = question_id
+        
+        # get valid id
+        validid = Code_Saved.objects.order_by("code_savedId").last().code_savedId + 1
+        code_saved_data["code_savedId"] = validid
+
+        # serialize
         code_saved_serializer = Code_Saved_Serializer(data = code_saved_data)
+
+        # if serializer is valid add to db
         if code_saved_serializer.is_valid():
+            outjson["error"] = 0
+            outjson["code_savedId"] = validid
+            outjson["errormsg"] = ""
             code_saved_serializer.save()
-            return JsonResponse("Saved Code is Successfully Added", safe = False)
-        return JsonResponse("Fail to Add Saved Code", safe = False)
+            return JsonResponse(outjson)
+
+        # if serializer is not valid return error
+        else:
+            outjson["errormsg"] = "invalid data"
+            return JsonResponse(outjson)
+
+        # undefined error case
+        return JsonResponse(outjson)
+
     elif request.method == 'PUT':
         code_saved_data = JSONParser().parse(request)
         code_saved = Code_Saved.objects.get(code_savedId = code_saved_data['code_savedId'], questionId = code_saved_data['questionId'])
@@ -128,10 +168,12 @@ def code_savedApi(request, question_id = 0, id=0):
             code_saved_serializer.save()
             return JsonResponse("Saved Code is Successfully Updated", safe = False)
         return JsonResponse("Fail to Update Saved Code", safe = False)
+
     elif request.method == 'DELETE':
         code_saved = Code_Saved.objects.get(questionId = question_id, code_savedId = id)
         code_saved.delete()
-        return JsonResponse("Saved COde is Succesfully Deleted", safe = False)
+        return JsonResponse("Saved Code is Succesfully Deleted", safe = False)
+
 @csrf_exempt
 def code_submittedApi(request, question_id = 0, id=0):
     if request.method == 'GET':
