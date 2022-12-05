@@ -78,6 +78,19 @@ export default function CodeEditor({
   let [cnt, letCnt] = useState(0);
   let [change, letChange] = useState(0);
 
+  const editorRef = useRef(null);
+
+  function handleEditorDidMount(editor, monaco) {
+    editorRef.current = editor;
+    console.log(JSON.parse(localStorage.getItem('currentCode')));
+  }
+
+  //코드 초기화
+  function handleEditorChange(){
+    let cur = editorRef.current.getValue();
+    localStorage.setItem('currentCode', JSON.stringify(cur));
+  }
+
   // 저장된 코드 불러오기 기능
   useEffect( ()=> {
     const newCodeSavedList = {};
@@ -102,12 +115,6 @@ export default function CodeEditor({
       letCnt(data.length);
     })
   },[]);
-
-  const editorRef = useRef(null);
-
-  function handleEditorDidMount(editor, monaco) {
-    editorRef.current = editor; 
-  }
 
   function codeSavedBtn(num){
     let id = Number(codeSavedIdList[num-1]);
@@ -266,8 +273,9 @@ export default function CodeEditor({
         <Editor
           height="calc(100vh - 151px)"
           defaultLanguage="python"
-          value={question?.skeletonCode || ''}
+          value={question?.skeletonCode || JSON.parse(localStorage.getItem('currentCode')) || '' }
           onMount={handleEditorDidMount}
+          onChange={handleEditorChange}
         />
       </Grid>
       <Grid item sx={style.itemBottom}>
