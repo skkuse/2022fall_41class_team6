@@ -1,5 +1,6 @@
-import { Grid } from '@mui/material';
-import React from 'react';
+import { Grid, Button, TextField } from '@mui/material';
+import React, { useState } from 'react';
+import axios from 'axios';
 
 const style = {
   container: {
@@ -31,9 +32,16 @@ const style = {
     py: 2,
     whiteSpace: 'pre-line',
   },
+  testButton: {
+    ml: '40%',
+    color: 'white',
+  }
 };
 
-export default function QuestionInfo({ question, testcaseList }) {
+export default function QuestionInfo({ question, testcaseList, editorRef}) {
+  const [testResult, setTestResult] = useState({});
+  const [clicked, setClicked] = useState(false);
+
   return (
     <Grid container direction="column" sx={style.container}>
       <Grid item sx={style.header}>
@@ -51,8 +59,35 @@ export default function QuestionInfo({ question, testcaseList }) {
         테스트케이스
       </Grid>
       {Object.entries(testcaseList).map((testcase, index) => (
-        <div>
-          <Grid item sx={style.subheader}>테스트케이스 {index + 1}</Grid>
+        <div key={index}>
+          <Grid item sx={style.subheader}>테스트케이스 {index + 1}
+            <Button variant="text" size="small" sx={style.testButton} onClick={() => {
+              const newClicked = {};
+              const newTestResult = {};
+
+              let userCode = editorRef.current.getValue();
+
+              newClicked[index] = true;
+              setClicked(newClicked);
+
+              axios.post(`/unittest/${testcaseList[index]?.testcaseId}/`, {
+                "code": userCode,
+              },
+              { headers: {
+                "Content-Type":"application/json", 
+                'Accept':'application/json'
+              }})
+              .then(function (response) {
+                console.log(response);
+                newTestResult[index] = response.data;
+                setTestResult(newTestResult);
+              })
+              .catch(function (error) {
+                console.log(error);
+              })
+            }}>검증</Button>
+            {clicked[index] && <Grid>{testResult[index]?.pass == 1? 'PASS' : 'FAIL'}</Grid>}
+          </Grid>
           <Grid item container>
             <Grid item xs={6}>
               Input
@@ -69,6 +104,20 @@ export default function QuestionInfo({ question, testcaseList }) {
               {testcaseList[index]?.output}
             </Grid>
           </Grid>
+          {testResult[index]?.pass == 0 && <div>
+            <Grid item container>
+              <Grid item xs={6}/>
+              <Grid item xs={6}>
+                Your Output
+              </Grid>
+            </Grid>
+            <Grid item container>
+              <Grid item xs={6}/>
+              <Grid item xs={6}>
+                {testResult[index]?.youroutput}
+              </Grid>
+            </Grid>  
+          </div>}
         </div>
       ))}
     </Grid>

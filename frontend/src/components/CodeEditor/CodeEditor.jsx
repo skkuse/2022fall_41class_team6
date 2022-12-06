@@ -70,6 +70,7 @@ export default function CodeEditor({
   codesaved,
   codeSavedIdList,
   setCodeSavedIdList,
+  editorRef
   
 }) {
   let [cnt, letCnt] = useState(0);
@@ -99,8 +100,6 @@ export default function CodeEditor({
       letCnt(data.length);
     })
   },[]);
-
-  const editorRef = useRef(null);
 
   function handleEditorDidMount(editor, monaco) {
     editorRef.current = editor; 

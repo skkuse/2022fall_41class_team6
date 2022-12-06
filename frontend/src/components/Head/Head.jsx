@@ -91,7 +91,7 @@ export default function Head({
     const newTestcaseList = {};
     axios.get(`/testcase/${selectedQuestionId}`).then(({ data }) => {
       data.forEach(({
-        testcaseId, questionId, isHidden, ...rest
+        questionId, isHidden, ...rest
       }) => {
         if (!isHidden) {
           newTestcaseList[i] = rest;

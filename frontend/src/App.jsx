@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   createTheme, CssBaseline, Grid, Stack, ThemeProvider,
 } from '@mui/material';
@@ -47,6 +47,8 @@ export default function App() {
     setRightWidth(rightWidth === 3 ? 1 : 3);
   };
 
+  const editorRef = useRef(null);
+
   return (
     <CssBaseline>
       <ThemeProvider theme={theme}>
@@ -66,7 +68,7 @@ export default function App() {
         />
         <Grid container sx={style.container}>
           <Grid item xs={leftWidth}>
-            <QuestionInfo question={questionList[selectedQuestionId]} testcaseList={testcaseList} />
+            <QuestionInfo question={questionList[selectedQuestionId]} testcaseList={testcaseList} editorRef={editorRef} />
           </Grid>
           <Grid item xs={12 - leftWidth - rightWidth} sx={style.itemCenter}>
             <CodeEditor
@@ -76,6 +78,7 @@ export default function App() {
               setCodeSavedList={setCodeSavedList}
               codeSavedIdList={codeSavedIdList}
               setCodeSavedIdList={setCodeSavedIdList}
+              editorRef={editorRef}
             />
           </Grid>
           <Grid item xs={rightWidth}>
