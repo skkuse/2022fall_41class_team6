@@ -602,8 +602,9 @@ def unittestApi2(request, testcase_id = 0):
             outdict[i] = errmsg
         return JsonResponse(outdict)
 
-    # get user's code from request. key = "code", value = the code that user writed
-    testcode = request.POST.get("code")
+    # get user's code from request. 
+    submit_data = JSONParser().parse(request)
+    testcode = submit_data["code"]
 
     # get testcase input, output
     testcase = Testcase.objects.filter(testcaseId = testcase_id)
@@ -674,7 +675,11 @@ def codeExecutionApi(request, question_id = 0):
     with open("./temp/testinput.txt", "w") as tifile:
         tifile.write(inputdata)
 
-    usercode = request.POST.get("code")
+    # get code from request
+    submit_data = JSONParser().parse(request)
+    usercode = submit_data["code"]
+
+    # make output dictionary
     outdict = {
             "output" : ""
             }
