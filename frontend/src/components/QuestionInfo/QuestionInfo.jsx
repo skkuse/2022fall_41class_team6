@@ -1,6 +1,7 @@
 import { Grid, Button, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useEffect } from 'react';
 
 const style = {
   container: {
@@ -41,6 +42,12 @@ const style = {
 export default function QuestionInfo({ question, testcaseList, editorRef}) {
   const [testResult, setTestResult] = useState({});
   const [clicked, setClicked] = useState(false);
+
+  useEffect(() => {
+    const newArray = {};
+    setTestResult(newArray);
+    setClicked(false);
+  }, [testcaseList])
 
   return (
     <Grid container direction="column" sx={style.container}>
