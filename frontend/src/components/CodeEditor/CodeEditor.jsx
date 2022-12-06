@@ -146,9 +146,7 @@ export default function CodeEditor({
       });
     }else{
       letCnt(++cnt);
-      axios.post('/code_saved/', {
-        code_savedId : cnt,
-        questionId : questionid,
+      axios.post('/code_saved/'+String(questionid)+'/', {
         code : val,
       },
       { headers : {
@@ -156,7 +154,7 @@ export default function CodeEditor({
         'Accept':'application/json'
       }})
       .then(function (response) {
-        console.log(response);
+        console.log(response.data.code_savedId);
       })
       .catch(function (error) {
         console.log(error.response.data);
