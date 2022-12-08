@@ -44,6 +44,7 @@ def lectureApi(request, id = 0):
         lecture = Lecture.objects.get(lectureId = id)
         lecture.delete()
         return JsonResponse("Deleted Successfully", safe = False)
+
 @csrf_exempt
 def questionApi(request, id = 0):
     if request.method == 'GET':
@@ -72,6 +73,7 @@ def questionApi(request, id = 0):
         question = Question.objects.get(questionId = id)
         question.delete()
         return JsonResponse("Deleted Successfully", safe = False)
+
 @csrf_exempt
 def testcaseApi(request, question_id = 0, id=0):
     if request.method == 'GET':
@@ -415,6 +417,7 @@ def codeEfficiencyApi(request, question_id = 0, id=0):
 
         return JsonResponse(outscore)
     return JsonResponse("only GET method is available", safe = False)
+
 @csrf_exempt
 def codePlagiarismApi(request, question_id = 0, id=0):
     if request.method == 'GET':
@@ -445,6 +448,7 @@ def codePlagiarismApi(request, question_id = 0, id=0):
 
         return JsonResponse(plagiarism, safe = False)
     return JsonResponse("only GET method is available", safe = False)
+
 @csrf_exempt
 def codeVisibilityApi(request, question_id, id):
     if request.method == 'GET':
@@ -524,6 +528,7 @@ def codeVisibilityApi(request, question_id, id):
 
         return JsonResponse(outscore)
     return JsonResponse("only GET method is available", safe = False)
+
 @csrf_exempt
 def codeExplainApi(request, question_id = 0, id=0):
     if request.method == 'GET':
@@ -531,7 +536,7 @@ def codeExplainApi(request, question_id = 0, id=0):
         code_submitted_codeonly_serializer = Code_Submitted_Codeonly_Serializer(code_submitted, many = True)
         rawcode = code_submitted_codeonly_serializer.data[0]["code"]
         
-        My_OpenAI_key = "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"
+        My_OpenAI_key = "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"
         openai.api_key = My_OpenAI_key
 
         # set openapi model
@@ -549,6 +554,7 @@ def codeExplainApi(request, question_id = 0, id=0):
         return JsonResponse(result, safe= False)
     else:
         return JsonResponse("only GET method is available!", safe= False)
+
 @csrf_exempt
 def unittestApi(request, testcase_id = 0, id = 0):
     if request.method == 'GET':
@@ -628,7 +634,7 @@ def unittestApi2(request, testcase_id = 0):
     testfile.write(output)
     testfile.close()
 
-    # refine answer output
+    # make answer tuple from output.txt
     file = open('./temp/output.txt', 'r')
     right_ans = file.read().split('\n')
     if len(right_ans) == 1:
@@ -662,6 +668,7 @@ def unittestApi2(request, testcase_id = 0):
 
 @csrf_exempt
 def codeExecutionApi(request, question_id = 0):
+    # return error message if the method is not POST
     if request.method != 'POST':
         outdict = {
                 "output" : "Use POST request"
@@ -694,6 +701,7 @@ def codeExecutionApi(request, question_id = 0):
     command = "python3 ./temp/exectemp.py < ./temp/testinput.txt > ./temp/execout.txt 2>&1"
     os.system(command)
 
+    # read execout.txt
     with open("./temp/execout.txt", "r") as f:
         outtxt = f.read()
 
