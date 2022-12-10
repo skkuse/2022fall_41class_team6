@@ -6,6 +6,11 @@ from django.utils import timezone
 from mainApp.models import *
 from mainApp.serializers import *
 
+from urllib.parse import quote_plus, unquote_plus
+import urllib.request as req
+from bs4 import BeautifulSoup
+from selenium import webdriver
+
 import json
 import os,sys
 import copydetect
@@ -104,7 +109,6 @@ def testcaseApi(request, question_id = 0, id=0):
         testcase = Testcase.objects.get(testcaseId = id)
         testcase.delete()
         return JsonResponse("Testcase is Successfully Deleted", safe = False)
-
 @csrf_exempt
 def code_savedApi(request, question_id = 0, id=0):
     if request.method == 'GET':
@@ -536,7 +540,7 @@ def codeExplainApi(request, question_id = 0, id=0):
         code_submitted_codeonly_serializer = Code_Submitted_Codeonly_Serializer(code_submitted, many = True)
         rawcode = code_submitted_codeonly_serializer.data[0]["code"]
         
-        My_OpenAI_key = "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"
+        My_OpenAI_key = "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"
         openai.api_key = My_OpenAI_key
 
         # set openapi model
@@ -708,4 +712,57 @@ def codeExecutionApi(request, question_id = 0):
     outdict["output"] = outtxt
     
     return JsonResponse(outdict)
+
+
+@csrf_exempt
+def referenceApi(request, question_id = 0):
+    if request.method != 'GET':
+        return JsonResponse("only GET method is available!", safe= False)
+    else:
+
+        outdict = {
+            "video" : ["",""], #영상 제목, 영상 링크
+            "question" :  ["",""], #관련 질문 링크
+            "learning" : [["",""],["",""],["",""]] #[관련자료 제목, 관련자료 링크] *3
+            }
+        
+        question = Question.objects.filter(questionId = question_id)
+        question_serializer = Question_Serializer(question, many = True)
+        reference = question_serializer.data[0]["relatedResource"]
+
+        reference_list = reference.split()
+
+
+        baseurl = "https://www.google.com/search?q="
+
+        #검색어는 db relatedresource 참고
+        plusurl = reference_list[1]
+        url = baseurl + quote_plus(plusurl, encoding='utf-8') #관련 자료 위한 url
+        url_video = baseurl + quote_plus(plusurl+"영상", encoding='utf-8') #관련 영상 크롤링 위한 url
+        driver = webdriver.Chrome()
+        
+        driver.get(url)
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
+        r = soup.select('.yuRUbf')
+
+        driver.get(url_video)
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
+        rv = soup.select('.sI5x9c')
+        
+        
+        outdict["video"] = [rv[0].select_one('.cHaqb').text, rv[0].a.attrs['href']]
+
+        outdict["question"] = [reference_list[1]+"연습 문제", reference_list[0]]
+
+        t=0
+        for i in r:
+            outdict["learning"][t] = [i.select_one('.LC20lb.DKV0Md').text, unquote_plus(i.a.attrs['href'], encoding='utf-8')]
+            t += 1
+            if t >=3:
+                break
+
+
+        return JsonResponse(outdict, safe = False)
 

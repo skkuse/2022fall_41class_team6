@@ -41,4 +41,6 @@ urlpatterns = [
     path('code_submitted/<testcase_id>/<id>/unittest', views.unittestApi),
     path('execution/<question_id>/', views.codeExecutionApi),
     path('unittest/<testcase_id>/', views.unittestApi2),
+
+    path ('reference/<question_id>/', views.referenceApi)
 ]
