@@ -6,6 +6,10 @@ from django.utils import timezone
 from mainApp.models import *
 from mainApp.serializers import *
 
+from urllib.parse import quote_plus
+from bs4 import BeautifulSoup
+from selenium import webdriver
+
 import json
 import os,sys
 import copydetect
@@ -104,7 +108,6 @@ def testcaseApi(request, question_id = 0, id=0):
         testcase = Testcase.objects.get(testcaseId = id)
         testcase.delete()
         return JsonResponse("Testcase is Successfully Deleted", safe = False)
-
 @csrf_exempt
 def code_savedApi(request, question_id = 0, id=0):
     if request.method == 'GET':
@@ -708,4 +711,36 @@ def codeExecutionApi(request, question_id = 0):
     outdict["output"] = outtxt
     
     return JsonResponse(outdict)
+
+
+@csrf_exempt
+def codeReferenceApi(request, question_id = 0):
+    if request.method != 'GET':
+        return JsonResponse("only GET method is available!", safe= False)
+    else:
+        baseurl = "https://www.google.com/search?q="
+        plusurl = input("coding")
+        url = baseurl + quote_plus(plusurl)
+        driver = webdriver.Chrome()
+        driver.get(url)
+
+        html = driver.page_source
+        soup = BeautifulSoup(html)
+
+        r = soup.select('.r')
+
+        outdict = {
+            "video" : "",
+            "question" :  "",
+            "learning" : ""
+            }
+        
+        a = []
+
+        for i in r:
+            a.append(i.select_one('.LC2olb.DKYOMd').text)
+            a.append(i.a.attrs['herf'])
+
+        return JsonResponse(a)
+        
 
