@@ -67,14 +67,30 @@ export default function CodeEditor({
   questionid,
   setCodeSavedList,
   codeSavedList,
-  codesaved,
+  // codesaved,
   codeSavedIdList,
   setCodeSavedIdList,
-  editorRef
-  
+  editorRef,
+  setSubmittedCodeId,
+  setErrorCode,
+  errorCode,
+  submittedCodeId,
 }) {
   let [cnt, letCnt] = useState(0);
   let [change, letChange] = useState(0);
+
+  // const editorRef = useRef(null);
+
+  function handleEditorDidMount(editor, monaco) {
+    editorRef.current = editor;
+    console.log(JSON.parse(localStorage.getItem('currentCode')));
+  }
+
+  //코드 초기화
+  function handleEditorChange(){
+    let cur = editorRef.current.getValue();
+    localStorage.setItem('currentCode', JSON.stringify(cur));
+  }
 
   // 저장된 코드 불러오기 기능
   useEffect( ()=> {
@@ -135,9 +151,7 @@ export default function CodeEditor({
       });
     }else{
       letCnt(++cnt);
-      axios.post('/code_saved/', {
-        code_savedId : cnt,
-        questionId : questionid,
+      axios.post('/code_saved/'+String(questionid)+'/', {
         code : val,
       },
       { headers : {
@@ -145,7 +159,7 @@ export default function CodeEditor({
         'Accept':'application/json'
       }})
       .then(function (response) {
-        console.log(response);
+        console.log(response.data.code_savedId);
       })
       .catch(function (error) {
         console.log(error.response.data);
@@ -198,6 +212,28 @@ export default function CodeEditor({
     saveAs(blob, 'temp.py');
   }
 
+  // 코드 제출 버튼
+  function handleSubmitCode(){
+    let val = String(editorRef.current.getValue());;
+    if(!val){
+      alert("작성된 코드가 없습니다. ");
+    }
+      axios.post('/code_submitted/'+String(questionid)+'/', {
+        code : val,
+      },
+      { headers : {
+        "Content-Type":"application/json", 
+        'Accept':'application/json'
+      }})
+      .then((response) => {
+        setSubmittedCodeId(response.data.code_submittedId);
+        setErrorCode(response.data.error);
+      })
+      .catch(function (error) {
+        console.log(error.response.data);
+      });
+  }
+
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -240,8 +276,9 @@ export default function CodeEditor({
         <Editor
           height="calc(100vh - 151px)"
           defaultLanguage="python"
-          value={question?.skeletonCode || ''}
+          value={question?.skeletonCode || JSON.parse(localStorage.getItem('currentCode')) || '' }
           onMount={handleEditorDidMount}
+          onChange={handleEditorChange}
         />
       </Grid>
       <Grid item sx={style.itemBottom}>
@@ -291,7 +328,7 @@ export default function CodeEditor({
                   3번</Button>
               </Box>
             </Modal>
-            <Button variant="contained" size="small" sx={style.submitButton} disabled = {question ? false : true}>
+            <Button variant="contained" size="small" sx={style.submitButton} onClick={() => handleSubmitCode()} disabled = {question ? false : true}>
               제출
             </Button>
           </Grid>
