@@ -79,9 +79,11 @@ export default function Reference() {
       </Grid>
       <Grid item sx={style.content}>
         {reference?.learning?.map(([title, link]) => (
-          <a key={title} href={link}>
-            {title}
-          </a>
+          <Box>
+            <a key={title} href={link}>
+              {title}
+            </a>
+          </Box>
         ))}
       </Grid>
     </Grid>
