@@ -750,9 +750,9 @@ def referenceApi(request, question_id = 0):
         html = driver.page_source
         soup = BeautifulSoup(html, "html.parser")
         rv = soup.select('.sI5x9c')
-        
-        
-        outdict["video"] = [rv[0].select_one('.cHaqb').text, rv[0].a.attrs['href']]
+
+        rv_link = rv[0].select('.X5OiLe')   
+        outdict["video"] = [rv[0].select_one('.cHaqb').text, rv_link[1].attrs['href']]
 
         outdict["question"] = [reference_list[1]+"연습 문제", reference_list[0]]
 
