@@ -26,6 +26,11 @@ const style = {
     borderLeft: '1px solid #0f151a',
     borderRight: '1px solid #0f151a',
   },
+  itemRight: {
+    height: 'calc(100vh - 50px)',
+    flexWrap: 'nowrap',
+    overflow: 'auto',
+  },
 };
 
 export default function App() {
@@ -88,7 +93,7 @@ export default function App() {
               submittedCodeId={submittedCodeId}
             />
           </Grid>
-          <Grid item xs={rightWidth}>
+          <Grid item xs={rightWidth} sx={style.itemRight}>
             <SubmitResult />
             <CodeExplanation />
             <Reference />
