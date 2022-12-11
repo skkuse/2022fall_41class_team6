@@ -8,6 +8,7 @@ import { CodeEditor } from './components/CodeEditor';
 import { QuestionInfo } from './components/QuestionInfo';
 import { SubmitResult } from './components/SubmitResult';
 import { CodeExplanation } from './components/CodeExplanation';
+import { Reference } from './components/Reference';
 
 const theme = createTheme({
   palette: {
@@ -90,6 +91,7 @@ export default function App() {
           <Grid item xs={rightWidth}>
             <SubmitResult />
             <CodeExplanation />
+            <Reference />
           </Grid>
         </Grid>
       </ThemeProvider>
