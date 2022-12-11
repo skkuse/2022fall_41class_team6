@@ -45,7 +45,7 @@ const style = {
   },
 };
 
-export default function SubmitResult() {
+export default function SubmitResult({ questionId, submittedCodeId }) {
   const [selectedTab, setSelectedTab] = useState(0);
   const [loading, setLoading] = useState(true);
   const [plagiarismRate, setPlagiarismRate] = useState(0);
@@ -55,26 +55,33 @@ export default function SubmitResult() {
   const [visibilityScore, setVisibilityScore] = useState({});
 
   useEffect(() => {
-    Promise.all([
-      axios.get('/testcase/1/'),
-      axios.get('/code_submitted/1/1/plagiarism'),
-      axios.get('/code_submitted/1/1/efficiency'),
-      axios.get('/code_submitted/1/1/visibility'),
-    ]).then(
-      ([{ data: testcases }, { data: plagiarism }, { data: efficiency }, { data: visibility }]) => {
-        setTestcaseList(testcases.map(({ testcaseId }) => testcaseId));
-        setPlagiarismRate(plagiarism);
-        setEfficiencyScore(efficiency);
-        setVisibilityScore(visibility);
-      },
-    );
-  }, []);
+    if (questionId > 0 && submittedCodeId > 0) {
+      Promise.all([
+        axios.get(`/testcase/${questionId}/`),
+        axios.get(`/code_submitted/${questionId}/${submittedCodeId}/plagiarism`),
+        axios.get(`/code_submitted/${questionId}/${submittedCodeId}/efficiency`),
+        axios.get(`/code_submitted/${questionId}/${submittedCodeId}/visibility`),
+      ]).then(
+        ([
+          { data: testcases },
+          { data: plagiarism },
+          { data: efficiency },
+          { data: visibility },
+        ]) => {
+          setTestcaseList(testcases.map(({ testcaseId }) => testcaseId));
+          setPlagiarismRate(plagiarism);
+          setEfficiencyScore(efficiency);
+          setVisibilityScore(visibility);
+        },
+      );
+    }
+  }, [questionId, submittedCodeId]);
 
   useEffect(() => {
     if (testcaseList.length) {
       const unittestResult = testcaseList.reduce(async (prev, testcaseId) => {
         const prevResult = await prev;
-        const { data } = await axios.get(`/code_submitted/${testcaseId}/1/unittest`);
+        const { data } = await axios.get(`/code_submitted/${testcaseId}/${submittedCodeId}/unittest`);
         return [...prevResult, data];
       }, Promise.resolve([]));
       unittestResult.then((result) => {

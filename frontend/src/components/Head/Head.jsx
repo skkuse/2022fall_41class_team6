@@ -23,7 +23,7 @@ const style = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-  }, 
+  },
   itemRight: {
     pr: 1,
     display: 'flex',
@@ -114,15 +114,14 @@ export default function Head({
     const hLeft = 23 - new Date().getHours();
     const mLeft = 59 - new Date().getMinutes();
 
-    if(late){
-      newTimeLeft[0] = "지각제출";
-    }
-    else{
-      newTimeLeft[0] = dLeft + "일 " + hLeft + "시간 " + mLeft + "분 남았습니다.";
+    if (late) {
+      newTimeLeft[0] = '지각제출';
+    } else {
+      newTimeLeft[0] = `${dLeft}일 ${hLeft}시간 ${mLeft}분 남았습니다.`;
     }
 
     setDeadlineDate(newTimeLeft);
-  }, [selectedQuestionId, new Date()]);
+  }, [selectedQuestionId]);
 
   function clickHomeButton() {
     location.href = 'http://127.0.0.1:3000';

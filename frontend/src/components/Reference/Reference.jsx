@@ -43,12 +43,12 @@ const style = {
   },
 };
 
-export default function Reference() {
+export default function Reference({ questionId }) {
   const [loading, setLoading] = useState(true);
   const [reference, setReference] = useState({});
 
   useEffect(() => {
-    axios.get('/reference/4').then(({ data }) => {
+    axios.get(`/reference/${questionId}`).then(({ data }) => {
       setReference(data);
       setLoading(false);
     });
