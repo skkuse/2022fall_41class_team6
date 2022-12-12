@@ -4,7 +4,7 @@ import axios from 'axios';
 import {
   Grid, IconButton, MenuItem, TextField,
 } from '@mui/material';
-import { Home, Settings } from '@mui/icons-material';
+import { Home } from '@mui/icons-material';
 import moment from 'moment';
 
 const style = {
