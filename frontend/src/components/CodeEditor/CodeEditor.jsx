@@ -245,6 +245,9 @@ export default function CodeEditor({
       .then((response) => {
         setSubmittedCodeId(response.data.code_submittedId);
         setErrorCode(response.data.error);
+        if (response.data.error) {
+          alert('제출 횟수를 초과했습니다.');
+        }
       })
       .catch((error) => {
         console.log(error.response.data);
