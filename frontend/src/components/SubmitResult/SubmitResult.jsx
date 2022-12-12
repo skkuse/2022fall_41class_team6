@@ -104,7 +104,7 @@ export default function SubmitResult({ questionId, submittedCodeId }) {
         <Grid item sx={{ ...style.plagiarismRate, color: plagiarismRate > 10 ? 'red' : 'green' }}>
           표절율
           {' '}
-          {plagiarismRate}
+          {plagiarismRate.toFixed(2)}
           %
         </Grid>
       </Grid>

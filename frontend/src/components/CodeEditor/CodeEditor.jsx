@@ -1,13 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import Editor from '@monaco-editor/react';
-import { Grid, IconButton, Button, Input, Modal, Box, Typography} from '@mui/material';
 import {
-  Folder,
-  Refresh,
-  ContentCopy,
-  FileDownload,
-  Save,
+  Grid, IconButton, Button, Input, Modal, Box, Typography,
+} from '@mui/material';
+import {
+  Folder, Refresh, ContentCopy, FileDownload, Save,
 } from '@mui/icons-material';
 import { saveAs } from 'file-saver';
 
@@ -62,7 +60,7 @@ const style = {
   },
 };
 
-export default function CodeEditor({ 
+export default function CodeEditor({
   question,
   questionid,
   setCodeSavedList,
@@ -86,84 +84,96 @@ export default function CodeEditor({
     console.log(JSON.parse(localStorage.getItem('currentCode')));
   }
 
-  //코드 초기화
-  function handleEditorChange(){
-    let cur = editorRef.current.getValue();
+  // 코드 초기화
+  function handleEditorChange() {
+    const cur = editorRef.current.getValue();
     localStorage.setItem('currentCode', JSON.stringify(cur));
   }
 
   // 저장된 코드 불러오기 기능
-  useEffect( ()=> {
+  useEffect(() => {
     const newCodeSavedList = {};
     const newCodeSavedIdList = {};
     let i = 0;
 
     axios.get('/code_saved').then(({ data }) => {
-      data.forEach(({ code_savedId, questionId, code}) => {
-        if(Number(questionid) === questionId){
-          newCodeSavedList[code_savedId]=code;
-          newCodeSavedIdList[i++]=code_savedId;
+      data.forEach(({ code_savedId, questionId, code }) => {
+        if (Number(questionid) === questionId) {
+          newCodeSavedList[code_savedId] = code;
+          newCodeSavedIdList[i++] = code_savedId;
         }
       });
       setCodeSavedList(newCodeSavedList);
       setCodeSavedIdList(newCodeSavedIdList);
     });
-  },[question, cnt, change]);
+  }, [question, cnt, change]);
 
-  //코드 저장 기능
-  useEffect(()=>{
-    axios.get('/code_saved').then(({data})=>{
+  // 코드 저장 기능
+  useEffect(() => {
+    axios.get('/code_saved').then(({ data }) => {
       letCnt(data.length);
-    })
-  },[]);
+    });
+  }, []);
 
   function handleEditorDidMount(editor, monaco) {
-    editorRef.current = editor; 
+    editorRef.current = editor;
   }
 
-  function codeSavedBtn(num){
-    let id = Number(codeSavedIdList[num-1]);
+  function codeSavedBtn(num) {
+    const id = Number(codeSavedIdList[num - 1]);
     editorRef.current.setValue(String(codeSavedList[id]));
   }
 
   function handleSaveCode(num) {
-    let val = String(editorRef.current.getValue());;
-    if(!val){
-      alert("작성된 코드가 없습니다. ");
+    const val = String(editorRef.current.getValue());
+    if (!val) {
+      alert('작성된 코드가 없습니다. ');
     }
-    let key = Number(codeSavedIdList[num-1]);    
-    if (key){
-      axios.put('/code_saved/', {
-        code_savedId : key,
-        questionId : questionid,
-        code : val,
-      },
-      { headers : {
-        "Content-Type":"application/json", 
-        'Accept':'application/json'
-      }})
-      .then(function (response) {
-        console.log(response);
-        letChange(++change);
-      })
-      .catch(function (error) {
-        console.log(error.response.data);
-      });
-    }else{
+    const key = Number(codeSavedIdList[num - 1]);
+    if (key) {
+      axios
+        .put(
+          '/code_saved/',
+          {
+            code_savedId: key,
+            questionId: questionid,
+            code: val,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+          },
+        )
+        .then((response) => {
+          console.log(response);
+          letChange(++change);
+        })
+        .catch((error) => {
+          console.log(error.response.data);
+        });
+    } else {
       letCnt(++cnt);
-      axios.post('/code_saved/'+String(questionid)+'/', {
-        code : val,
-      },
-      { headers : {
-        "Content-Type":"application/json", 
-        'Accept':'application/json'
-      }})
-      .then(function (response) {
-        console.log(response.data.code_savedId);
-      })
-      .catch(function (error) {
-        console.log(error.response.data);
-      });
+      axios
+        .post(
+          `/code_saved/${String(questionid)}/`,
+          {
+            code: val,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+          },
+        )
+        .then((response) => {
+          console.log(response.data.code_savedId);
+        })
+        .catch((error) => {
+          console.log(error.response.data);
+        });
     }
   }
 
@@ -174,15 +184,14 @@ export default function CodeEditor({
     fileInput.current.click();
   };
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const fileObj = e.target.files[0];
-    if(fileObj){
-      
+    if (fileObj) {
     }
     const reader = new FileReader();
     reader.onload = () => {
       editorRef.current.setValue(String(reader.result));
-    }
+    };
     reader.readAsText(e.target.files[0], 'utf-8');
   };
 
@@ -193,43 +202,54 @@ export default function CodeEditor({
 
   // 코드 복사 기능
   function codeCopy() {
-    let text = String(editorRef.current.getValue());
-    if (navigator.clipboard){
-      navigator.clipboard.writeText(text).then(()=>{
-        alert("클립보드에 복사되었습니다.");
-      })
-      .catch(() => {
-        alert("복사를 다시 시도해주세요.");
-      });
+    const text = String(editorRef.current.getValue());
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          alert('클립보드에 복사되었습니다.');
+        })
+        .catch(() => {
+          alert('복사를 다시 시도해주세요.');
+        });
     }
   }
-  
+
   // 코드 다운로드 기능
-  function downloadAsFile(){
-    var text = String(editorRef.current.getValue());
+  function downloadAsFile() {
+    const text = String(editorRef.current.getValue());
     console.log(text);
-    var blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     saveAs(blob, 'temp.py');
   }
 
   // 코드 제출 버튼
-  function handleSubmitCode(){
-    let val = String(editorRef.current.getValue());;
-    if(!val){
-      alert("작성된 코드가 없습니다. ");
+  function handleSubmitCode() {
+    const val = String(editorRef.current.getValue());
+    if (!val) {
+      alert('작성된 코드가 없습니다. ');
     }
-      axios.post('/code_submitted/'+String(questionid)+'/', {
-        code : val,
-      },
-      { headers : {
-        "Content-Type":"application/json", 
-        'Accept':'application/json'
-      }})
+    axios
+      .post(
+        `/code_submitted/${String(questionid)}/`,
+        {
+          code: val,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        },
+      )
       .then((response) => {
         setSubmittedCodeId(response.data.code_submittedId);
         setErrorCode(response.data.error);
+        if (response.data.error) {
+          alert('제출 횟수를 초과했습니다.');
+        }
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log(error.response.data);
       });
   }
@@ -246,28 +266,31 @@ export default function CodeEditor({
         </Grid>
         <Grid item sx={style.itemTopRight}>
           <Save sx={style.saveIcon} />
-          <Button 
-          variant="contained" 
-          size="small" 
-          sx={style.saveButton}
-          onClick={() => codeSavedBtn(1)}  
-          disabled = {codeSavedIdList[0] ? false : true} >
+          <Button
+            variant="contained"
+            size="small"
+            sx={style.saveButton}
+            onClick={() => codeSavedBtn(1)}
+            disabled={!codeSavedIdList[0]}
+          >
             1
           </Button>
-          <Button 
-          variant="contained" 
-          size="small" 
-          sx={style.saveButton}
-          onClick={() => codeSavedBtn(2)}
-          disabled = {codeSavedIdList[1] ? false : true} >
+          <Button
+            variant="contained"
+            size="small"
+            sx={style.saveButton}
+            onClick={() => codeSavedBtn(2)}
+            disabled={!codeSavedIdList[1]}
+          >
             2
           </Button>
-          <Button 
-          variant="contained" 
-          size="small" 
-          sx={style.saveButton}
-          onClick={() => codeSavedBtn(3)}
-          disabled = {codeSavedIdList[2] ? false : true} >
+          <Button
+            variant="contained"
+            size="small"
+            sx={style.saveButton}
+            onClick={() => codeSavedBtn(3)}
+            disabled={!codeSavedIdList[2]}
+          >
             3
           </Button>
         </Grid>
@@ -276,7 +299,7 @@ export default function CodeEditor({
         <Editor
           height="calc(100vh - 151px)"
           defaultLanguage="python"
-          value={question?.skeletonCode || JSON.parse(localStorage.getItem('currentCode')) || '' }
+          value={question?.skeletonCode || JSON.parse(localStorage.getItem('currentCode')) || ''}
           onMount={handleEditorDidMount}
           onChange={handleEditorChange}
         />
@@ -287,10 +310,10 @@ export default function CodeEditor({
             <IconButton sx={style.iconButton} onClick={handleClickButton}>
               <Folder />
             </IconButton>
-            <Input 
-              type='file' 
-              style={{display:'none'}}
-              onChange={handleChange} 
+            <Input
+              type="file"
+              style={{ display: 'none' }}
+              onChange={handleChange}
               inputRef={fileInput}
             />
             <IconButton sx={style.iconButton} onClick={codeRefresh}>
@@ -304,10 +327,13 @@ export default function CodeEditor({
             </IconButton>
           </Grid>
           <Grid item>
-            <Button variant="outlined" size="small" sx={style.button} disabled = {question ? false : true}>
-              실행
-            </Button>
-            <Button variant="outlined" size="small" sx={style.button} onClick={handleOpen} disabled = {question ? false : true}>
+            <Button
+              variant="outlined"
+              size="small"
+              sx={style.button}
+              onClick={handleOpen}
+              disabled={!question}
+            >
               저장
             </Button>
             <Modal
@@ -320,15 +346,41 @@ export default function CodeEditor({
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                   코드 저장 슬롯 선택
                 </Typography>
-                <Button variant="outlined" size="small" sx={style.button} onClick={() => handleSaveCode(1)}>
-                  1번</Button>
-                <Button variant="outlined" size="small" sx={style.button} onClick={() => handleSaveCode(2)} disabled = {codeSavedIdList[0] ? false : true}>
-                  2번</Button>
-                <Button variant="outlined" size="small" sx={style.button} onClick={() => handleSaveCode(3)} disabled = {codeSavedIdList[1] ? false : true}>
-                  3번</Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  sx={style.button}
+                  onClick={() => handleSaveCode(1)}
+                >
+                  1번
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  sx={style.button}
+                  onClick={() => handleSaveCode(2)}
+                  disabled={!codeSavedIdList[0]}
+                >
+                  2번
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  sx={style.button}
+                  onClick={() => handleSaveCode(3)}
+                  disabled={!codeSavedIdList[1]}
+                >
+                  3번
+                </Button>
               </Box>
             </Modal>
-            <Button variant="contained" size="small" sx={style.submitButton} onClick={() => handleSubmitCode()} disabled = {question ? false : true}>
+            <Button
+              variant="contained"
+              size="small"
+              sx={style.submitButton}
+              onClick={() => handleSubmitCode()}
+              disabled={!question}
+            >
               제출
             </Button>
           </Grid>

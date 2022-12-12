@@ -4,7 +4,7 @@ import axios from 'axios';
 import {
   Grid, IconButton, MenuItem, TextField,
 } from '@mui/material';
-import { Home, Settings } from '@mui/icons-material';
+import { Home } from '@mui/icons-material';
 import moment from 'moment';
 
 const style = {
@@ -60,7 +60,6 @@ export default function Head({
   setTestcaseList,
   deadlineDate,
   setDeadlineDate,
-
 }) {
   useEffect(() => {
     axios.get('/lecture').then(({ data }) => {
@@ -90,9 +89,7 @@ export default function Head({
     let i = 0;
     const newTestcaseList = {};
     axios.get(`/testcase/${selectedQuestionId}`).then(({ data }) => {
-      data.forEach(({
-        questionId, isHidden, ...rest
-      }) => {
+      data.forEach(({ questionId, isHidden, ...rest }) => {
         if (!isHidden) {
           newTestcaseList[i] = rest;
           i++;
@@ -163,13 +160,11 @@ export default function Head({
           sx={style.textField}
         >
           <MenuItem value={0}>문제 선택</MenuItem>
-          {Object.entries(questionList).map(
-            ([questionId, { questionName }]) => (
-              <MenuItem key={questionId} value={questionId}>
-                {questionName}
-              </MenuItem>
-            ),
-          )}
+          {Object.entries(questionList).map(([questionId, { questionName }]) => (
+            <MenuItem key={questionId} value={questionId}>
+              {questionName}
+            </MenuItem>
+          ))}
         </TextField>
       </Grid>
       <Grid item xs={3} sx={style.itemRight}>
@@ -177,18 +172,11 @@ export default function Head({
           variant="outlined"
           size="small"
           disabled
-          value={
-            selectedQuestionId
-              ? `${deadlineDate[0]}`
-              : '제출기한'
-          }
+          value={selectedQuestionId ? `${deadlineDate[0]}` : '제출기한'}
           InputProps={{ sx: style.Input }}
           inputProps={{ sx: style.input }}
           sx={{ ...style.textField, width: 600 }}
         />
-        <IconButton sx={style.iconButton}>
-          <Settings />
-        </IconButton>
       </Grid>
     </Grid>
   );
